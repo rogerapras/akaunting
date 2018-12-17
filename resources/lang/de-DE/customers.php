@@ -6,6 +6,11 @@ return [
     'user_created'          => 'Benutzer angelegt',
 
     'error' => [
-        'email'             => 'Diese Email wurde bereits benutzt.'
-    ]
+        'email'             => 'Diese Email ist bereits in Benutzung.'
+    ],
+
+    'notification' => [
+        'message'       => ':customer hat eine Zahlung von :amount für die Rechnungsnummer :invoice_number vorgenommen.',
+        'button'        => 'Anzeigen',
+    ],
 ];

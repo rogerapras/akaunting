@@ -1,13 +1,14 @@
-# Akaunting™
+﻿# Akaunting™
 
-![Latest Stable Version](https://img.shields.io/github/release/akaunting/akaunting.svg) ![Total Downloads](https://img.shields.io/github/downloads/akaunting/akaunting/total.svg) [![Crowdin](https://d322cqt584bo4o.cloudfront.net/akaunting/localized.svg)](https://crowdin.com/project/akaunting)
+ ![Latest Stable Version](https://img.shields.io/github/release/akaunting/akaunting.svg) ![Total Downloads](https://img.shields.io/github/downloads/akaunting/akaunting/total.svg) [![Crowdin](https://d322cqt584bo4o.cloudfront.net/akaunting/localized.svg)](https://crowdin.com/project/akaunting) ![Build Status](https://travis-ci.com/akaunting/akaunting.svg) [![Backers on Open Collective](https://opencollective.com/akaunting/backers/badge.svg)](#backers) [![Sponsors on Open Collective](https://opencollective.com/akaunting/sponsors/badge.svg)](#sponsors)
 
 Akaunting is a free, open source and online accounting software designed for small businesses and freelancers. It is built with modern technologies such as Laravel, Bootstrap, jQuery, RESTful API etc. Thanks to its modular structure, Akaunting provides an awesome App Store for users and developers.
 
 * [Home](https://akaunting.com) - The house of Akaunting
 * [Blog](https://akaunting.com/blog) - Get the latest news
-* [Forum](https://akaunting.com/forum) - Join the community
-* [Documentation](https://akaunting.com/docs) - Learn more about Akaunting
+* [Forum](https://akaunting.com/forum) - Ask for support
+* [Documentation](https://akaunting.com/docs) - Learn how to use
+* [Translations](https://crowdin.com/project/akaunting) - Akaunting in your language
 
 ## Requirements
 
@@ -30,24 +31,27 @@ Akaunting uses [Laravel](http://laravel.com), the best existing PHP framework, a
 
 ## Docker
 
-It is possible to containerise Akaunting using the [`docker-compose`](docker/docker-compose.build.yaml) file. Here are a few commands:
+It is possible to containerise Akaunting using the [`docker-compose`](docker-compose.yml) file. Here are a few commands:
 
 ```
-# Make sure you the dependencies are installed
-composer install
-
 # Build the app
-docker-compose -f docker/docker-compose.build.yaml build
+docker build -t akaunting .
 
 # Run the app
-docker-compose up
+docker-compose up -d
+
+# Make sure you the dependencies are installed
+docker-compose exec web composer install
+
+# Stream logs
+docker-compose logs -f web
 
 # Access the container
-docker exec -it CONTAINER_ID /bin/sh
-```
+docker-compose exec web /bin/sh
 
-## docker-compose examples
-In the `docker/` folder you'll find some example file to run the image with several databases. 
+# Stop & Delete everything
+docker-compose down -v
+```
 
 ## Contributing
 
@@ -76,6 +80,32 @@ If you discover any security related issues, please email security@akaunting.com
 - [Denis Duliçi](https://github.com/denisdulici)
 - [Cüneyt Şentürk](https://github.com/cuneytsenturk)
 - [All Contributors](../../contributors)
+
+## Contributors
+
+This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
+[![Contributors](https://opencollective.com/akaunting/contributors.svg?width=890&button=false)](../../contributors)
+
+## Backers
+
+Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/akaunting#backer)]
+
+[![Backers](https://opencollective.com/akaunting/backers.svg?width=890)](https://opencollective.com/akaunting#backers)
+
+## Sponsors
+
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/akaunting#sponsor)]
+
+[![Sponsor 0](https://opencollective.com/akaunting/sponsor/0/avatar.svg)](https://opencollective.com/akaunting/sponsor/0/website)
+[![Sponsor 1](https://opencollective.com/akaunting/sponsor/1/avatar.svg)](https://opencollective.com/akaunting/sponsor/1/website)
+[![Sponsor 2](https://opencollective.com/akaunting/sponsor/2/avatar.svg)](https://opencollective.com/akaunting/sponsor/2/website)
+[![Sponsor 3](https://opencollective.com/akaunting/sponsor/3/avatar.svg)](https://opencollective.com/akaunting/sponsor/3/website)
+[![Sponsor 4](https://opencollective.com/akaunting/sponsor/4/avatar.svg)](https://opencollective.com/akaunting/sponsor/4/website)
+[![Sponsor 5](https://opencollective.com/akaunting/sponsor/5/avatar.svg)](https://opencollective.com/akaunting/sponsor/5/website)
+[![Sponsor 6](https://opencollective.com/akaunting/sponsor/6/avatar.svg)](https://opencollective.com/akaunting/sponsor/6/website)
+[![Sponsor 7](https://opencollective.com/akaunting/sponsor/7/avatar.svg)](https://opencollective.com/akaunting/sponsor/7/website)
+[![Sponsor 8](https://opencollective.com/akaunting/sponsor/8/avatar.svg)](https://opencollective.com/akaunting/sponsor/8/website)
+[![Sponsor 9](https://opencollective.com/akaunting/sponsor/9/avatar.svg)](https://opencollective.com/akaunting/sponsor/9/website)
 
 ## License
 

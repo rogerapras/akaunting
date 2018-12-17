@@ -12,10 +12,15 @@ return [
     'quantity'          => 'Adet',
     'price'             => 'Fiyat',
     'sub_total'         => 'Ara Toplam',
+    'discount'          => 'İndirim',
     'tax_total'         => 'Vergi Toplamı',
     'total'             => 'Toplam',
 
     'item_name'         => 'Öğe Adı | Öğe Adları',
+
+    'show_discount'     => '%:discount İndirim',
+    'add_discount'      => 'İndirim Ekle',
+    'discount_desc'     => 'ara toplam üzerinden',
 
     'payment_due'       => 'Son Ödeme Tarihi',
     'paid'              => 'Ödenmiş',
@@ -26,6 +31,7 @@ return [
     'mark_sent'         => 'Gönderildi İşaretle',
     'download_pdf'      => 'PDF İndir',
     'send_mail'         => 'Email Gönder',
+    'all_invoices'      => 'Tüm faturaları görüntülemek için giriş yapın',
 
     'status' => [
         'draft'         => 'Taslak',
@@ -37,8 +43,21 @@ return [
     ],
 
     'messages' => [
-        'email_sent'    => 'Fatura emaili başarı ile gönderildi!',
-        'marked_sent'   => 'Fatura başarıyla gönderilmiş olarak işaretlendi!',
+        'email_sent'     => 'Fatura emaili başarı ile gönderildi!',
+        'marked_sent'    => 'Fatura başarıyla gönderilmiş olarak işaretlendi!',
+        'email_required' => 'Bu müşteri için e-posta adresi yok!',
+        'draft'          => 'Bu bir <b>TASLAK</b> faturadır ve gönderildikten sonra grafiklere yansıtılacaktır.',
+
+        'status' => [
+            'created'   => ':date tarihinde oluşturuldu',
+            'send'      => [
+                'draft'     => 'Gönderilmedi',
+                'sent'      => ':date tarihinde gönderildi',
+            ],
+            'paid'      => [
+                'await'     => 'Ödeme bekliyor',
+            ],
+        ],
     ],
 
     'notification' => [

@@ -6,6 +6,11 @@ return [
     'user_created'          => 'Gebruiker aangemaakt',
 
     'error' => [
-        'email'             => 'Deze e-mail is reeds geregistreerd.'
-    ]
+        'email'             => 'Dit e-mailadres is al reeds geregistreerd.'
+    ],
+
+    'notification' => [
+        'message'       => ':customer betaalde :amount voor factuur :invoice_number.',
+        'button'        => 'Weergeven',
+    ],
 ];

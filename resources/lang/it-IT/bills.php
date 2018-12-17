@@ -12,10 +12,15 @@ return [
     'quantity'          => 'Quantità',
     'price'             => 'Prezzo',
     'sub_total'         => 'Subtotale',
+    'discount'          => 'Sconto',
     'tax_total'         => 'Totale imposta',
     'total'             => 'Totale',
 
     'item_name'         => 'Nome dell\'articolo|Nomi degli articoli',
+
+    'show_discount'     => ': discount% Sconto',
+    'add_discount'      => 'Aggiungi Sconto',
+    'discount_desc'     => 'di subtotale',
 
     'payment_due'       => 'Scadenza pagamento',
     'amount_due'        => 'Importo dovuto',
@@ -36,6 +41,18 @@ return [
 
     'messages' => [
         'received'      => 'Fattura segnata con successo come ricevuta!',
+        'draft'          => 'Questa è una <b>BOZZA</b> della fattura e si rifletterà sui grafici dopo che sarà ricevuta.',
+
+        'status' => [
+            'created'   => 'Creato il :date',
+            'receive'      => [
+                'draft'     => 'Non inviato',
+                'received'  => 'Ricevuto il :date',
+            ],
+            'paid'      => [
+                'await'     => 'In attesa del pagamento',
+            ],
+        ],
     ],
 
 ];

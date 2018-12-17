@@ -4,7 +4,7 @@
 
 @permission('create-settings-taxes')
 @section('new_button')
-<span class="new-button"><a href="{{ url('settings/taxes/create') }}" class="btn btn-success btn-sm"><span class="fa fa-plus"></span> &nbsp;Add New</a></span>
+<span class="new-button"><a href="{{ url('settings/taxes/create') }}" class="btn btn-success btn-sm"><span class="fa fa-plus"></span> &nbsp;{{ trans('general.add_new') }}</a></span>
 @endsection
 @endpermission
 
@@ -32,7 +32,8 @@
                 <thead>
                     <tr>
                         <th class="col-md-5">@sortablelink('name', trans('general.name'))</th>
-                        <th class="col-md-5">@sortablelink('rate', trans('taxes.rate_percent'))</th>
+                        <th class="col-md-3">@sortablelink('rate', trans('taxes.rate_percent'))</th>
+                        <th class="col-md-2">@sortablelink('type', trans_choice('general.types', 1))</th>
                         <th class="col-md-1 hidden-xs">@sortablelink('enabled', trans_choice('general.statuses', 1))</th>
                         <th class="col-md-1 text-center">{{ trans('general.actions') }}</th>
                     </tr>
@@ -42,6 +43,7 @@
                     <tr>
                         <td><a href="{{ url('settings/taxes/' . $item->id . '/edit') }}">{{ $item->name }}</a></td>
                         <td>{{ $item->rate }}</td>
+                        <td>{{ $types[$item->type] }}</td>
                         <td class="hidden-xs">
                             @if ($item->enabled)
                                 <span class="label label-success">{{ trans('general.enabled') }}</span>
@@ -56,7 +58,13 @@
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-right">
                                     <li><a href="{{ url('settings/taxes/' . $item->id . '/edit') }}">{{ trans('general.edit') }}</a></li>
+                                    @if ($item->enabled)
+                                    <li><a href="{{ route('taxes.disable', $item->id) }}">{{ trans('general.disable') }}</a></li>
+                                    @else
+                                    <li><a href="{{ route('taxes.enable', $item->id) }}">{{ trans('general.enable') }}</a></li>
+                                    @endif
                                     @permission('delete-settings-taxes')
+                                    <li class="divider"></li>
                                     <li>{!! Form::deleteLink($item, 'settings/taxes', 'tax_rates') !!}</li>
                                     @endpermission
                                 </ul>

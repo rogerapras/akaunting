@@ -38,6 +38,11 @@ class Currency extends Model
         return $this->hasMany('App\Models\Income\Invoice', 'currency_code', 'code');
     }
 
+    public function invoice_payments()
+    {
+        return $this->hasMany('App\Models\Income\InvoicePayment', 'currency_code', 'code');
+    }
+
     public function revenues()
     {
         return $this->hasMany('App\Models\Income\Revenue', 'currency_code', 'code');
@@ -46,6 +51,11 @@ class Currency extends Model
     public function bills()
     {
         return $this->hasMany('App\Models\Expense\Bill', 'currency_code', 'code');
+    }
+
+    public function bill_payments()
+    {
+        return $this->hasMany('App\Models\Expense\BillPayment', 'currency_code', 'code');
     }
 
     public function payments()
@@ -62,5 +72,75 @@ class Currency extends Model
     public function setRateAttribute($value)
     {
         $this->attributes['rate'] = (double) $value;
+    }
+
+    /**
+     * Get the current precision.
+     *
+     * @return string
+     */
+    public function getPrecisionAttribute($value)
+    {
+        if (is_null($value)) {
+            return config('money.' . $this->code . '.precision');
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get the current symbol.
+     *
+     * @return string
+     */
+    public function getSymbolAttribute($value)
+    {
+        if (is_null($value)) {
+            return config('money.' . $this->code . '.symbol');
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get the current symbol_first.
+     *
+     * @return string
+     */
+    public function getSymbolFirstAttribute($value)
+    {
+        if (is_null($value)) {
+            return config('money.' . $this->code . '.symbol_first');
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get the current decimal_mark.
+     *
+     * @return string
+     */
+    public function getDecimalMarkAttribute($value)
+    {
+        if (is_null($value)) {
+            return config('money.' . $this->code . '.decimal_mark');
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get the current thousands_separator.
+     *
+     * @return string
+     */
+    public function getThousandsSeparatorAttribute($value)
+    {
+        if (is_null($value)) {
+            return config('money.' . $this->code . '.thousands_separator');
+        }
+
+        return $value;
     }
 }

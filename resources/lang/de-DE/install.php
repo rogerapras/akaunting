@@ -6,7 +6,7 @@ return [
     'refresh'               => 'Aktualisieren',
 
     'steps' => [
-        'requirements'      => 'Bitte, erfüllen Sie die folgenden Anforderungen!',
+        'requirements'      => 'Bitte wenden Sie sich an Ihren Hosting-Dienstleister um die Fehler beheben zu lassen!',
         'language'          => 'Schritt 1/3: Sprachauswahl',
         'database'          => 'Schritt 2/3: Datenbank-Setup',
         'settings'          => 'Schritt 3/3: Unternehmen und Admin-Details',
@@ -17,15 +17,14 @@ return [
     ],
 
     'requirements' => [
-        'php_version'       => 'PHP 5.6.4 oder höher muss verwendet werden!',
         'enabled'           => ':feature muss aktiviert sein!',
         'disabled'          => ':feature muss deaktiviert sein!',
-        'extension'         => ':extension Erweiterung muss geladen sein!',
+        'extension'         => ':extension Erweiterung muss installiert und geladen sein!',
         'directory'         => ':directory Verzeichnis muss schreibbar sein!',
     ],
 
     'database' => [
-        'hostname'          => 'Hostname',
+        'hostname'          => 'Servername',
         'username'          => 'Benutzername',
         'password'          => 'Passwort',
         'name'              => 'Datenbank',
@@ -39,7 +38,7 @@ return [
     ],
 
     'error' => [
-        'connection'        => 'Fehler: Konnte keine Verbindung zur Datenbank hergestellt werden! Stellen Sie sicher, dass die Angaben korrekt sind.',
+        'connection'        => 'Fehler: Es konnte keine Verbindung zur Datenbank hergestellt werden! Stellen Sie sicher, dass die Angaben korrekt sind.',
     ],
 
 ];

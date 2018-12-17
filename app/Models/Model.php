@@ -35,7 +35,7 @@ class Model extends Eloquent
      */
     public function company()
     {
-        return $this->belongsTo('App\Models\Company\Company');
+        return $this->belongsTo('App\Models\Common\Company');
     }
 
     /**
@@ -91,11 +91,11 @@ class Model extends Eloquent
         $input = $request->input();
         $limit = $request->get('limit', setting('general.list_limit', '25'));
 
-        return $this->filter($input)->sortable($sort)->paginate($limit);
+        return $query->filter($input)->sortable($sort)->paginate($limit);
     }
 
     /**
-     * Scope to only include active currencies.
+     * Scope to only include active models.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @return \Illuminate\Database\Eloquent\Builder
@@ -103,5 +103,55 @@ class Model extends Eloquent
     public function scopeEnabled($query)
     {
         return $query->where('enabled', 1);
+    }
+
+    /**
+     * Scope to only include passive models.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeDisabled($query)
+    {
+        return $query->where('enabled', 0);
+    }
+
+    /**
+     * Scope to only include reconciled models.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param $value
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeReconciled($query, $value = 1)
+    {
+        return $query->where('reconciled', $value);
+    }
+
+    public function scopeAccount($query, $accounts)
+    {
+        if (empty($accounts)) {
+            return;
+        }
+
+        return $query->whereIn('account_id', (array) $accounts);
+    }
+
+    public function scopeCustomer($query, $customers)
+    {
+        if (empty($customers)) {
+            return;
+        }
+
+        return $query->whereIn('customer_id', (array) $customers);
+    }
+
+    public function scopeVendor($query, $vendors)
+    {
+        if (empty($vendors)) {
+            return;
+        }
+
+        return $query->whereIn('vendor_id', (array) $vendors);
     }
 }

@@ -21,6 +21,11 @@ return [
             'space'         => 'Boşluk ( )',
         ],
         'timezone'          => 'Saat dilimi',
+        'percent' => [
+            'title'         => 'Yüzde (%) Konumu',
+            'before'        => 'Sayıdan Önce',
+            'after'         => 'Sayıdan Sonra',
+        ],
     ],
     'invoice' => [
         'tab'               => 'Fatura',
@@ -28,6 +33,16 @@ return [
         'digit'             => 'Numara Rakam Sayısı',
         'next'              => 'Sonraki Numara',
         'logo'              => 'Logo',
+        'custom'            => 'Özel',
+        'item_name'         => 'Ürün adı',
+        'item'              => 'Ürünler',
+        'product'           => 'Ürünler',
+        'service'           => 'Hizmetler',
+        'price_name'        => 'Fiyat Adı',
+        'price'             => 'Fiyat',
+        'rate'              => 'Oran',
+        'quantity_name'     => 'Miktar Adı',
+        'quantity'          => 'Miktar',
     ],
     'default' => [
         'tab'               => 'Varsayılanlar',
@@ -61,6 +76,8 @@ return [
         'bill_days'         => 'Vade Gününden Önce Gönder',
         'cron_command'      => 'Cron Komutu',
         'schedule_time'     => 'Çalışma Saati',
+        'send_item_reminder'=> 'Ürün Hatırlatıcısı Gönder',
+        'item_stocks'       => 'Stoktataki Ürünü Gönderme Zamanı',
     ],
     'appearance' => [
         'tab'               => 'Görünüm',

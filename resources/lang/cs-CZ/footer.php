@@ -4,6 +4,7 @@ return [
 
     'version'               => 'Verze',
     'powered'               => 'Powered By Akaunting',
-    'software'              => 'Svobodný účetní software',
+    'link'                  => 'https://akaunting.com',
+    'software'              => 'Učetní software zdarma',
 
 ];

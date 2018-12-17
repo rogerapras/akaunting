@@ -6,7 +6,7 @@ return [
     'refresh'               => 'Aktualizovat',
 
     'steps' => [
-        'requirements'      => 'Prosím splň následující požadavky!',
+        'requirements'      => 'Prosím, požádej svého poskytovatele hostingu o opravu chyb!',
         'language'          => 'Krok 1/3: Výběr jazyka',
         'database'          => 'Krok 2/3: Nastavení databáze',
         'settings'          => 'Krok 3/3: Údaje o společnosti a administrátorovi',
@@ -17,10 +17,9 @@ return [
     ],
 
     'requirements' => [
-        'php_version'       => 'Vyžaduji PHP 5.6.4 a vyšší!',
         'enabled'           => 'Musíš povolit :feature!',
         'disabled'          => 'Musiš vypnout :feature!',
-        'extension'         => 'Musíš zavést rozšíření:extension!',
+        'extension'         => 'Koncovka :extension musí být nainstalována nebo nahrána!',
         'directory'         => 'Do složky:directory se musí dát zapisovat!',
     ],
 

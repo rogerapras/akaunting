@@ -7,8 +7,8 @@ use App\Models\Module\Module;
 use App\Models\Module\ModuleHistory;
 use App\Traits\Modules;
 use Artisan;
+use Module as LModule;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Route;
 
 class Item extends Controller
 {
@@ -16,13 +16,9 @@ class Item extends Controller
 
     /**
      * Instantiate a new controller instance.
-     *
-     * @param  Route  $route
      */
-    public function __construct(Route $route)
+    public function __construct()
     {
-        parent::__construct($route);
-
         // Add CRUD permission check
         $this->middleware('permission:create-modules-item')->only(['install']);
         $this->middleware('permission:update-modules-item')->only(['update', 'enable', 'disable']);
@@ -40,10 +36,14 @@ class Item extends Controller
     {
         $this->checkApiToken();
 
-        $installed = false;
         $enable = false;
+        $installed = false;
 
         $module = $this->getModule($alias);
+
+        if (empty($module)) {
+            return redirect('apps/home')->send();
+        }
 
         $check = Module::alias($alias)->first();
 
@@ -55,7 +55,19 @@ class Item extends Controller
             }
         }
 
-        return view('modules.item.show', compact('module', 'about', 'installed', 'enable'));
+        if (request()->get('utm_source')) {
+            $parameters = request()->all();
+
+            $character = '?';
+
+            if (strpos($module->action_url, '?') !== false) {
+                $character = '&';
+            }
+
+            $module->action_url .= $character . http_build_query($parameters);
+        }
+
+        return view('modules.item.show', compact('module', 'installed', 'enable'));
     }
 
     /**
@@ -69,29 +81,29 @@ class Item extends Controller
     {
         $this->checkApiToken();
 
-        $json = array();
-        $json['step'] = array();
+        $json = [];
+        $json['step'] = [];
 
         $name = $request['name'];
         $version = $request['version'];
 
         // Download
-        $json['step'][] = array(
+        $json['step'][] = [
             'text' => trans('modules.installation.download', ['module' => $name]),
             'url'  => url('apps/download')
-        );
+        ];
 
         // Unzip
-        $json['step'][] = array(
+        $json['step'][] = [
             'text' => trans('modules.installation.unzip', ['module' => $name]),
             'url'  => url('apps/unzip')
-        );
+        ];
 
         // Download
-        $json['step'][] = array(
+        $json['step'][] = [
             'text' => trans('modules.installation.install', ['module' => $name]),
             'url'  => url('apps/install')
-        );
+        ];
 
         return response()->json($json);
     }
@@ -152,8 +164,6 @@ class Item extends Controller
         $json = $this->installModule($path);
 
         if ($json['success']) {
-            Artisan::call('module:install', ['alias' => $json['data']['alias'], 'company_id' => session('company_id')]);
-
             $message = trans('modules.installed', ['module' => $json['data']['name']]);
 
             flash($message)->success();
@@ -170,13 +180,13 @@ class Item extends Controller
 
         $module = Module::alias($alias)->first();
 
-        $data = array(
+        $data = [
             'company_id' => session('company_id'),
             'module_id' => $module->id,
             'category' => $json['data']['category'],
             'version' => $json['data']['version'],
             'description' => trans('modules.uninstalled', ['module' => $json['data']['name']]),
-        );
+        ];
 
         ModuleHistory::create($data);
 
@@ -197,13 +207,13 @@ class Item extends Controller
 
         $module = Module::alias($alias)->first();
 
-        $data = array(
+        $data = [
             'company_id' => session('company_id'),
             'module_id' => $module->id,
             'category' => $json['data']['category'],
             'version' => $json['data']['version'],
             'description' => trans_choice('modules.updated', $json['data']['name']),
-        );
+        ];
 
         ModuleHistory::create($data);
 
@@ -222,13 +232,13 @@ class Item extends Controller
 
         $module = Module::alias($alias)->first();
 
-        $data = array(
+        $data = [
             'company_id' => session('company_id'),
             'module_id' => $module->id,
             'category' => $json['data']['category'],
             'version' => $json['data']['version'],
             'description' => trans('modules.enabled', ['module' => $json['data']['name']]),
-        );
+        ];
 
         $module->status = 1;
 
@@ -251,13 +261,13 @@ class Item extends Controller
 
         $module = Module::alias($alias)->first();
 
-        $data = array(
+        $data = [
             'company_id' => session('company_id'),
             'module_id' => $module->id,
             'category' => $json['data']['category'],
             'version' => $json['data']['version'],
             'description' => trans('modules.disabled', ['module' => $json['data']['name']]),
-        );
+        ];
 
         $module->status = 0;
 
@@ -270,5 +280,64 @@ class Item extends Controller
         flash($message)->success();
 
         return redirect('apps/' . $alias)->send();
+    }
+
+    /**
+     * Final actions post update.
+     *
+     * @param  $alias
+     * @param  $old
+     * @param  $new
+     * @return Response
+     */
+    public function post($alias)
+    {
+        Artisan::call('module:install', ['alias' => $alias, 'company_id' => session('company_id')]);
+
+        $module = LModule::findByAlias($alias);
+
+        $message = trans('modules.installed', ['module' => $module->get('name')]);
+
+        flash($message)->success();
+
+        return redirect('apps/' . $alias);
+    }
+
+    public function reviews($alias, Request $request)
+    {
+        $page = $request['page'];
+
+        $data = [
+            'query' => [
+                'page' => ($page) ? $page : 1,
+            ]
+        ];
+
+        $reviews = $this->getModuleReviews($alias, $data);
+
+        $html = view('partials.modules.reviews', compact('reviews'))->render();
+
+        return response()->json([
+            'success' => true,
+            'error' => false,
+            'data' => null,
+            'message' => null,
+            'html' => $html,
+        ]);
+    }
+
+    public function documentation($alias)
+    {
+        $this->checkApiToken();
+
+        $documentation = $this->getDocumentation($alias);
+
+        if (empty($documentation)) {
+            return redirect('apps/' . $alias)->send();
+        }
+
+        $back = 'apps/' . $alias;
+
+        return view('modules.item.documentation', compact('documentation', 'back'));
     }
 }

@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Reports;
 
 use App\Http\Controllers\Controller;
+use App\Models\Banking\Account;
 use App\Models\Expense\Bill;
 use App\Models\Expense\BillPayment;
 use App\Models\Expense\Payment;
+use App\Models\Expense\Vendor;
 use App\Models\Setting\Category;
+use App\Utilities\Recurring;
 use Charts;
 use Date;
 
@@ -22,18 +25,16 @@ class ExpenseSummary extends Controller
         $dates = $totals = $expenses = $expenses_graph = $categories = [];
 
         $status = request('status');
+        $year = request('year', Date::now()->year);
 
-        //if ($filter != 'upcoming') {
-            $categories = Category::enabled()->type('expense')->pluck('name', 'id')->toArray();
-        //}
+        $categories = Category::enabled()->type('expense')->orderBy('name')->pluck('name', 'id')->toArray();
 
-        // Add Bill in Categories
-        $categories[0] = trans_choice('general.bills', 2);
-
-        // Get year
-        $year = request('year');
-        if (empty($year)) {
-            $year = Date::now()->year;
+        if ($categories_filter = request('categories')) {
+            $cats = collect($categories)->filter(function ($value, $key) use ($categories_filter) {
+                return in_array($key, $categories_filter);
+            });
+        } else {
+            $cats = $categories;
         }
 
         // Dates
@@ -49,16 +50,7 @@ class ExpenseSummary extends Controller
                 'currency_rate' => 1
             );
 
-            // Bill
-            $expenses[0][$dates[$j]] = array(
-                'category_id' => 0,
-                'name' => trans_choice('general.bills', 1),
-                'amount' => 0,
-                'currency_code' => setting('general.default_currency'),
-                'currency_rate' => 1
-            );
-
-            foreach ($categories as $category_id => $category_name) {
+            foreach ($cats as $category_id => $category_name) {
                 $expenses[$category_id][$dates[$j]] = array(
                     'category_id' => $category_id,
                     'name' => $category_name,
@@ -69,27 +61,58 @@ class ExpenseSummary extends Controller
             }
         }
 
-        // Bills
+        $payments = Payment::monthsOfYear('paid_at')->account(request('accounts'))->vendor(request('vendors'))->isNotTransfer()->get();
+
         switch ($status) {
             case 'paid':
-                $bills = BillPayment::monthsOfYear('paid_at')->get();
+                // Bills
+                $bills = BillPayment::monthsOfYear('paid_at')->account(request('accounts'))->get();
                 $this->setAmount($expenses_graph, $totals, $expenses, $bills, 'bill', 'paid_at');
+
+                // Payments
+                $this->setAmount($expenses_graph, $totals, $expenses, $payments, 'payment', 'paid_at');
                 break;
             case 'upcoming':
-                $bills = Bill::accrued()->monthsOfYear('due_at')->get();
+                // Bills
+                $bills = Bill::accrued()->monthsOfYear('due_at')->vendor(request('vendors'))->get();
+                Recurring::reflect($bills, 'bill', 'billed_at', $status);
                 $this->setAmount($expenses_graph, $totals, $expenses, $bills, 'bill', 'due_at');
+
+                // Payments
+                Recurring::reflect($payments, 'payment', 'paid_at', $status);
+                $this->setAmount($expenses_graph, $totals, $expenses, $payments, 'payment', 'paid_at');
                 break;
             default:
-                $bills = Bill::accrued()->monthsOfYear('billed_at')->get();
+                // Bills
+                $bills = Bill::accrued()->monthsOfYear('billed_at')->vendor(request('vendors'))->get();
+                Recurring::reflect($bills, 'bill', 'billed_at', $status);
                 $this->setAmount($expenses_graph, $totals, $expenses, $bills, 'bill', 'billed_at');
+
+                // Payments
+                Recurring::reflect($payments, 'payment', 'paid_at', $status);
+                $this->setAmount($expenses_graph, $totals, $expenses, $payments, 'payment', 'paid_at');
                 break;
         }
 
-        // Payments
-        if ($status != 'upcoming') {
-            $payments = Payment::monthsOfYear('paid_at')->get();
-            $this->setAmount($expenses_graph, $totals, $expenses, $payments, 'payment', 'paid_at');
+        $statuses = collect([
+            'all' => trans('general.all'),
+            'paid' => trans('invoices.paid'),
+            'upcoming' => trans('dashboard.payables'),
+        ]);
+
+        $accounts = Account::enabled()->pluck('name', 'id')->toArray();
+        $vendors = Vendor::enabled()->pluck('name', 'id')->toArray();
+
+        // Check if it's a print or normal request
+        if (request('print')) {
+            $chart_template = 'vendor.consoletvs.charts.chartjs.multi.line_print';
+            $view_template = 'reports.expense_summary.print';
+        } else {
+            $chart_template = 'vendor.consoletvs.charts.chartjs.multi.line';
+            $view_template = 'reports.expense_summary.index';
         }
+
+        $print_url = $this->getPrintUrl($year);
 
         // Expenses chart
         $chart = Charts::multi('line', 'chartjs')
@@ -98,26 +121,51 @@ class ExpenseSummary extends Controller
             ->dataset(trans_choice('general.expenses', 1), $expenses_graph)
             ->labels($dates)
             ->credits(false)
-            ->view('vendor.consoletvs.charts.chartjs.multi.line');
+            ->view($chart_template);
 
-        // Expenses Graph
-        $expenses_graph = json_encode($expenses_graph);
-
-        return view('reports.expense_summary.index', compact('chart', 'dates', 'categories', 'expenses', 'totals'));
+        return view($view_template, compact(
+            'chart',
+            'dates',
+            'categories',
+            'statuses',
+            'accounts',
+            'vendors',
+            'expenses',
+            'totals',
+            'print_url'
+        ));
     }
 
     private function setAmount(&$graph, &$totals, &$expenses, $items, $type, $date_field)
     {
         foreach ($items as $item) {
-            $date = Date::parse($item->$date_field)->format('F');
+            switch ($item->getTable()) {
+                case 'bill_payments':
+                    $bill = $item->bill;
 
-            if ($type == 'bill') {
-                $category_id = 0;
-            } else {
-                $category_id = $item->category_id;
+                    if ($vendors = request('vendors')) {
+                        if (!in_array($bill->vendor_id, $vendors)) {
+                            continue;
+                        }
+                    }
+
+                    $item->category_id = $bill->category_id;
+                    break;
+                case 'bills':
+                    if ($accounts = request('accounts')) {
+                        foreach ($item->payments as $payment) {
+                            if (!in_array($payment->account_id, $accounts)) {
+                                continue 2;
+                            }
+                        }
+                    }
+                    break;
             }
 
-            if (!isset($expenses[$category_id])) {
+            $month = Date::parse($item->$date_field)->format('F');
+            $month_year = Date::parse($item->$date_field)->format('F-Y');
+
+            if (!isset($expenses[$item->category_id]) || !isset($expenses[$item->category_id][$month]) || !isset($graph[$month_year])) {
                 continue;
             }
 
@@ -130,13 +178,34 @@ class ExpenseSummary extends Controller
                 }
             }
 
-            $expenses[$category_id][$date]['amount'] += $amount;
-            $expenses[$category_id][$date]['currency_code'] = $item->currency_code;
-            $expenses[$category_id][$date]['currency_rate'] = $item->currency_rate;
+            $expenses[$item->category_id][$month]['amount'] += $amount;
+            $expenses[$item->category_id][$month]['currency_code'] = $item->currency_code;
+            $expenses[$item->category_id][$month]['currency_rate'] = $item->currency_rate;
 
-            $graph[Date::parse($item->$date_field)->format('F-Y')] += $amount;
+            $graph[$month_year] += $amount;
 
-            $totals[$date]['amount'] += $amount;
+            $totals[$month]['amount'] += $amount;
         }
+    }
+
+    private function getPrintUrl($year)
+    {
+        $print_url = 'reports/expense-summary?print=1'
+            . '&status=' . request('status')
+            . '&year='. request('year', $year);
+
+        collect(request('accounts'))->each(function($item) use(&$print_url) {
+            $print_url .= '&accounts[]=' . $item;
+        });
+
+        collect(request('vendors'))->each(function($item) use(&$print_url) {
+            $print_url .= '&vendors[]=' . $item;
+        });
+
+        collect(request('categories'))->each(function($item) use(&$print_url) {
+            $print_url .= '&categories[]=' . $item;
+        });
+
+        return $print_url;
     }
 }

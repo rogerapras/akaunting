@@ -21,6 +21,11 @@ return [
             'space'         => 'فضا ( )',
         ],
         'timezone'          => 'منطقه زمانی',
+        'percent' => [
+            'title'         => 'درصد (%) موقعیت',
+            'before'        => 'قبل از شماره',
+            'after'         => 'پس از شماره',
+        ],
     ],
     'invoice' => [
         'tab'               => 'فاکتور',
@@ -28,6 +33,16 @@ return [
         'digit'             => 'تعداد ارقام',
         'next'              => 'شماره بعدی',
         'logo'              => 'لوگو',
+        'custom'            => 'سفارشی',
+        'item_name'         => 'نام کالا',
+        'item'              => 'کالاها',
+        'product'           => 'محصول‌ها',
+        'service'           => 'خدمات',
+        'price_name'        => 'قیمت نام',
+        'price'             => 'قيمت',
+        'rate'              => 'نرخ',
+        'quantity_name'     => 'نام مقدار',
+        'quantity'          => 'مقدار',
     ],
     'default' => [
         'tab'               => 'پیش‌فرض‌ها',
@@ -61,6 +76,8 @@ return [
         'bill_days'         => 'تعداد روز ارسال قبل از سررسید',
         'cron_command'      => 'فرمان Cron',
         'schedule_time'     => 'ساعت به اجرا',
+        'send_item_reminder'=> 'ارسال به یادآوری',
+        'item_stocks'       => 'ارسال زمانی که موجود باشد',
     ],
     'appearance' => [
         'tab'               => 'ظاهر',

@@ -12,10 +12,15 @@ return [
     'quantity'          => '數量',
     'price'             => '售價',
     'sub_total'         => '小計',
+    'discount'          => '折扣',
     'tax_total'         => '稅額',
     'total'             => '總計',
 
     'item_name'         => '產品名稱 | 產品名稱',
+
+    'show_discount'     => ':discount% 折扣',
+    'add_discount'      => '新增折扣',
+    'discount_desc'     => '小計',
 
     'payment_due'       => '付款到期日',
     'amount_due'        => '到期金額',
@@ -36,6 +41,18 @@ return [
 
     'messages' => [
         'received'      => '成功標記帳單為已收到！',
+        'draft'          => '這是 <b>草稿</b> 帳單, 在簽收後將反映在圖表上。',
+
+        'status' => [
+            'created'   => '創建於 :date',
+            'receive'      => [
+                'draft'     => '未發送',
+                'received'  => '簽收於 :date',
+            ],
+            'paid'      => [
+                'await'     => '等待付款',
+            ],
+        ],
     ],
 
 ];

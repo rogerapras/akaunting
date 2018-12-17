@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
 class Login extends Controller
@@ -50,7 +49,7 @@ class Login extends Controller
     public function store()
     {
         // Attempt to login
-        if (!auth()->attempt(request(['email', 'password']))) {
+        if (!auth()->attempt(request(['email', 'password']), request('remember', false))) {
             flash(trans('auth.failed'))->error();
 
             return back();
@@ -61,7 +60,7 @@ class Login extends Controller
 
         // Check if user is enabled
         if (!$user->enabled) {
-            auth()->logout();
+            $this->logout();
 
             flash(trans('auth.disabled'))->error();
 
@@ -70,16 +69,39 @@ class Login extends Controller
 
         // Check if is customer
         if ($user->customer) {
-            return redirect('customers');
+            $path = session('url.intended', 'customers');
+
+            // Path must start with 'customers' prefix
+            if (!str_contains($path, 'customers')) {
+                $path = 'customers';
+            }
+
+            return redirect($path);
         }
 
-        return redirect('/');
+        // Check wizard
+        if (!setting('general.wizard', false)) {
+            return redirect('wizard');
+        }
+
+        return redirect()->intended('/');
     }
 
     public function destroy()
     {
-        auth()->logout();
+        $this->logout();
 
         return redirect('auth/login');
+    }
+
+    public function logout()
+    {
+        auth()->logout();
+
+        // Session destroy is required if stored in database
+        if (env('SESSION_DRIVER') == 'database') {
+            $request = app('Illuminate\Http\Request');
+            $request->session()->getHandler()->destroy($request->session()->getId());
+        }
     }
 }

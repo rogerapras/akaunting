@@ -6,7 +6,7 @@ return [
     'refresh'               => 'Rifresko',
 
     'steps' => [
-        'requirements'      => 'Ju lutemi, plotësoni kërkesat e mëposhtme!',
+        'requirements'      => 'Ju lutemi, pyesni ofruesin tuaj të hosting për të rregulluar gabimet!',
         'language'          => 'Hapi 1/3: Përzgjedhja e Gjuhës',
         'database'          => 'Hapi 2/3: Vendosja e Database',
         'settings'          => 'Hapi 3/3: Detajet e Kompanisë dhe Adminit',
@@ -17,10 +17,9 @@ return [
     ],
 
     'requirements' => [
-        'php_version'       => 'PHP 5.6.4 ose më lart duhet të përdoret!',
         'enabled'           => ':feature duhet të aktivizohet!',
         'disabled'          => ':feature duhet të çaktivizohet!',
-        'extension'         => ':extension shtesa duhet të ngarkohet!',
+        'extension'         => ':extension shtesa duhet të instalohet dhe të ngarkohet!',
         'directory'         => ':directory lista duhet të jetë e shkrueshme!',
     ],
 

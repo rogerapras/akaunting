@@ -6,7 +6,7 @@ return [
     'refresh'               => 'Làm mới',
 
     'steps' => [
-        'requirements'      => 'Xin vui lòng, đáp ứng các yêu cầu sau đây!',
+        'requirements'      => 'Please, ask your hosting provider to fix the errors!',
         'language'          => 'Bước 1/3: Lựa chọn ngôn ngữ',
         'database'          => 'Bước 2/3: Thiết lập cơ sở dữ liệu',
         'settings'          => 'Bước 3/3: Chi tiết thông tin công ty và trang quản trị',
@@ -17,10 +17,9 @@ return [
     ],
 
     'requirements' => [
-        'php_version'       => 'Hệ thống yêu cầu cài đặt phiên bản PHP từ 5.6.4 trở lên!',
         'enabled'           => ':feature cần phải được kích hoạt!',
         'disabled'          => ':feature cần phải được vô hiệu hoá!',
-        'extension'         => ':extension extension cần phải được cài đặt!',
+        'extension'         => ':extension extension needs to be installed and loaded!',
         'directory'         => 'Thư mục :directory cần được cấp quyền writable!',
     ],
 

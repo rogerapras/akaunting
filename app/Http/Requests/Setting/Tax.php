@@ -25,7 +25,9 @@ class Tax extends Request
     {
         return [
             'name' => 'required|string',
-            'rate' => 'required',
+            'rate' => 'required|min:0|max:100',
+            'type' => 'required|string',
+            'enabled' => 'integer|boolean',
         ];
     }
 }

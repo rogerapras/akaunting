@@ -2,7 +2,10 @@
 
 return [
 
-    'rate'                  => 'Preis',
-    'rate_percent'          => 'Preis (%)',
+    'rate'                  => 'Steuersatz',
+    'rate_percent'          => 'Steuersatz (%)',
+    'normal'                => 'Normal',
+    'inclusive'             => 'Inklusive',
+    'compound'              => 'zusammengesetzt',
 
 ];

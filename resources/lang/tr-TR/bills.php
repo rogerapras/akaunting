@@ -12,10 +12,15 @@ return [
     'quantity'          => 'Adet',
     'price'             => 'Fiyat',
     'sub_total'         => 'Ara Toplam',
+    'discount'          => 'İndirim',
     'tax_total'         => 'Vergi Toplamı',
     'total'             => 'Toplam',
 
     'item_name'         => 'Öğe Adı | Öğe Adları',
+
+    'show_discount'     => '%:discount İndirim',
+    'add_discount'      => 'İndirim Ekle',
+    'discount_desc'     => 'ara toplam üzerinden',
 
     'payment_due'       => 'Son Ödeme Tarihi',
     'amount_due'        => 'Ödenecek Miktar',
@@ -36,6 +41,18 @@ return [
 
     'messages' => [
         'received'      => 'Fatura başarıyla teslim alındı olarak işaretlendi!',
+        'draft'          => 'Bu bir <b>Taslak</b> faturadır ve alındıktan sonra grafiklere yansıtılacaktır.',
+
+        'status' => [
+            'created'   => ':date tarihinde oluşturuldu',
+            'receive'      => [
+                'draft'     => 'Gönderilmedi',
+                'received'  => ':date tarihinde alındı',
+            ],
+            'paid'      => [
+                'await'     => 'Bekleyen Ödeme',
+            ],
+        ],
     ],
 
 ];

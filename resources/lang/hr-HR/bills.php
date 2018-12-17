@@ -12,10 +12,15 @@ return [
     'quantity'          => 'Količina',
     'price'             => 'Cijena',
     'sub_total'         => 'Podzbroj',
+    'discount'          => 'Popust',
     'tax_total'         => 'Porez Ukupno',
     'total'             => 'Ukupno',
 
     'item_name'         => 'Naziv stavke|Nazivi stavaka',
+
+    'show_discount'     => ':discount% popusta',
+    'add_discount'      => 'Dodaj popust',
+    'discount_desc'     => 'od podzbroja',
 
     'payment_due'       => 'Dospijeća plaćanja',
     'amount_due'        => 'Dospjeli iznos',
@@ -36,6 +41,18 @@ return [
 
     'messages' => [
         'received'      => 'Račun označen kao uspješno primljen!',
+        'draft'          => 'Ovo je <b>SKICA</b> računa i odrazit će se na grafikone nakon što se zaprimi.',
+
+        'status' => [
+            'created'   => 'Kreirano :date',
+            'receive'      => [
+                'draft'     => 'Nije poslano',
+                'received'  => 'Zaprimljeno :date',
+            ],
+            'paid'      => [
+                'await'     => 'Čeka plaćanje',
+            ],
+        ],
     ],
 
 ];

@@ -21,6 +21,11 @@ return [
             'space'         => 'Spazio ( )',
         ],
         'timezone'          => 'Fuso Orario',
+        'percent' => [
+            'title'         => 'Percentuale (%) Posizione',
+            'before'        => 'Prima del Numero',
+            'after'         => 'Dopo il Numero',
+        ],
     ],
     'invoice' => [
         'tab'               => 'Fattura',
@@ -28,6 +33,16 @@ return [
         'digit'             => 'Numero cifre',
         'next'              => 'Codice fiscale',
         'logo'              => 'Logo',
+        'custom'            => 'Personalizzato',
+        'item_name'         => 'Nome dell\'elemento',
+        'item'              => 'Elementi',
+        'product'           => 'Prodotti',
+        'service'           => 'Servizi',
+        'price_name'        => 'Nome del prezzo',
+        'price'             => 'Prezzo',
+        'rate'              => 'Valutazione',
+        'quantity_name'     => 'Quantità Nome',
+        'quantity'          => 'Quantità',
     ],
     'default' => [
         'tab'               => 'Predefiniti',
@@ -61,6 +76,8 @@ return [
         'bill_days'         => 'Inviare entro Due giorni',
         'cron_command'      => 'Comando cron',
         'schedule_time'     => 'Ora di esecuzione',
+        'send_item_reminder'=> 'Invia promemoria oggetto',
+        'item_stocks'       => 'Invia quando l\'oggetto è in Stock',
     ],
     'appearance' => [
         'tab'               => 'Aspetto',

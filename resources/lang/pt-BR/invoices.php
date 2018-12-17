@@ -12,20 +12,26 @@ return [
     'quantity'          => 'Quantidade',
     'price'             => 'Preço',
     'sub_total'         => 'Subtotal',
+    'discount'          => 'Desconto',
     'tax_total'         => 'Valor da taxa',
     'total'             => 'Total',
 
     'item_name'         => 'Item|Itens',
+
+    'show_discount'     => ':discount% desconto',
+    'add_discount'      => 'Adicionar desconto',
+    'discount_desc'     => 'subtotal',
 
     'payment_due'       => 'Pagamento vencido',
     'paid'              => 'Pago',
     'histories'         => 'Histórico',
     'payments'          => 'Pagamentos',
     'add_payment'       => 'Novo Pagamento',
-    'mark_paid'         => 'Mark Paid',
-    'mark_sent'         => 'Mark Sent',
+    'mark_paid'         => 'Marcar como pago',
+    'mark_sent'         => 'Marcar Como Enviada',
     'download_pdf'      => 'Baixar em PDF',
     'send_mail'         => 'Enviar E-mail',
+    'all_invoices'      => 'Faça login para ver todas as faturas',
 
     'status' => [
         'draft'         => 'Rascunho',
@@ -37,13 +43,26 @@ return [
     ],
 
     'messages' => [
-        'email_sent'    => 'Invoice email has been sent successfully!',
-        'marked_sent'   => 'Invoice marked as sent successfully!',
+        'email_sent'     => 'O e-mail foi enviado com sucesso!',
+        'marked_sent'    => 'Fatura marcada como enviada com sucesso!',
+        'email_required' => 'Nenhum endereço de e-mail para este cliente!',
+        'draft'          => 'Este é um <b>RASCUNHO</b> de fatura e será refletida nos gráficos depois que ela for enviada.',
+
+        'status' => [
+            'created'   => 'Criado em :date',
+            'send'      => [
+                'draft'     => 'Não enviado',
+                'sent'      => 'Enviado em :date',
+            ],
+            'paid'      => [
+                'await'     => 'Aguardando pagamento',
+            ],
+        ],
     ],
 
     'notification' => [
-        'message'       => 'You are receiving this email because you have an upcoming :amount invoice to :customer customer.',
-        'button'        => 'Pay Now',
+        'message'       => 'Você está recebendo este e-mail porque tem :amount fatura a vencer.',
+        'button'        => 'Pagar agora',
     ],
 
 ];

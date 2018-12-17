@@ -3,24 +3,29 @@
 namespace App\Models\Expense;
 
 use App\Models\Model;
+use App\Models\Setting\Category;
 use App\Traits\Currencies;
 use App\Traits\DateTime;
+use App\Traits\Media;
+use App\Traits\Recurring;
 use Bkwld\Cloner\Cloneable;
 use Sofa\Eloquence\Eloquence;
-use Plank\Mediable\Mediable;
+use Date;
 
 class Payment extends Model
 {
-    use Cloneable, Currencies, DateTime, Eloquence, Mediable;
+    use Cloneable, Currencies, DateTime, Eloquence, Media, Recurring;
 
     protected $table = 'payments';
+
+    protected $dates = ['deleted_at', 'paid_at'];
 
     /**
      * Attributes that should be mass-assignable.
      *
      * @var array
      */
-    protected $fillable = ['company_id', 'account_id', 'paid_at', 'amount', 'currency_code', 'currency_rate', 'vendor_id', 'description', 'category_id', 'payment_method', 'reference'];
+    protected $fillable = ['company_id', 'account_id', 'paid_at', 'amount', 'currency_code', 'currency_rate', 'vendor_id', 'description', 'category_id', 'payment_method', 'reference', 'parent_id'];
 
     /**
      * Sortable columns.
@@ -41,14 +46,16 @@ class Payment extends Model
         'description'  ,
     ];
 
+    /**
+     * Clonable relationships.
+     *
+     * @var array
+     */
+    public $cloneable_relations = ['recurring'];
+
     public function account()
     {
         return $this->belongsTo('App\Models\Banking\Account');
-    }
-
-    public function currency()
-    {
-        return $this->belongsTo('App\Models\Setting\Currency', 'currency_code', 'code');
     }
 
     public function category()
@@ -56,14 +63,46 @@ class Payment extends Model
         return $this->belongsTo('App\Models\Setting\Category');
     }
 
-    public function vendor()
+    public function currency()
     {
-        return $this->belongsTo('App\Models\Expense\Vendor');
+        return $this->belongsTo('App\Models\Setting\Currency', 'currency_code', 'code');
+    }
+
+    public function recurring()
+    {
+        return $this->morphOne('App\Models\Common\Recurring', 'recurable');
     }
 
     public function transfers()
     {
         return $this->hasMany('App\Models\Banking\Transfer');
+    }
+
+    public function vendor()
+    {
+        return $this->belongsTo('App\Models\Expense\Vendor');
+    }
+
+    /**
+     * Get only transfers.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeIsTransfer($query)
+    {
+        return $query->where('category_id', '=', Category::transfer());
+    }
+
+    /**
+     * Skip transfers.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeIsNotTransfer($query)
+    {
+        return $query->where('category_id', '<>', Category::transfer());
     }
 
     /**

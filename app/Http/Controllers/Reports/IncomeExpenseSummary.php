@@ -3,13 +3,17 @@
 namespace App\Http\Controllers\Reports;
 
 use App\Http\Controllers\Controller;
+use App\Models\Banking\Account;
+use App\Models\Income\Customer;
 use App\Models\Income\Invoice;
 use App\Models\Income\InvoicePayment;
 use App\Models\Income\Revenue;
 use App\Models\Expense\Bill;
 use App\Models\Expense\BillPayment;
 use App\Models\Expense\Payment;
+use App\Models\Expense\Vendor;
 use App\Models\Setting\Category;
+use App\Utilities\Recurring;
 use Charts;
 use Date;
 
@@ -25,26 +29,16 @@ class IncomeExpenseSummary extends Controller
         $dates = $totals = $compares = $profit_graph = $categories = [];
 
         $status = request('status');
+        $year = request('year', Date::now()->year);
+        $categories_filter = request('categories');
 
-        //if ($filter != 'upcoming') {
-            $income_categories = Category::enabled()->type('income')->pluck('name', 'id')->toArray();
-        //}
+        $income_categories = Category::enabled()->type('income')->when($categories_filter, function ($query) use ($categories_filter) {
+            return $query->whereIn('id', $categories_filter);
+        })->orderBy('name')->pluck('name', 'id')->toArray();
 
-        // Add Invoice in Categories
-        $income_categories[0] = trans_choice('general.invoices', 2);
-
-        //if ($filter != 'upcoming') {
-            $expense_categories = Category::enabled()->type('expense')->pluck('name', 'id')->toArray();
-        //}
-
-        // Add Bill in Categories
-        $expense_categories[0] = trans_choice('general.bills', 2);
-
-        // Get year
-        $year = request('year');
-        if (empty($year)) {
-            $year = Date::now()->year;
-        }
+        $expense_categories = Category::enabled()->type('expense')->when($categories_filter, function ($query) use ($categories_filter) {
+            return $query->whereIn('id', $categories_filter);
+        })->orderBy('name')->pluck('name', 'id')->toArray();
 
         // Dates
         for ($j = 1; $j <= 12; $j++) {
@@ -54,15 +48,6 @@ class IncomeExpenseSummary extends Controller
 
             // Totals
             $totals[$dates[$j]] = array(
-                'amount' => 0,
-                'currency_code' => setting('general.default_currency'),
-                'currency_rate' => 1
-            );
-
-            // Compares
-            $compares['income'][0][$dates[$j]] = array(
-                'category_id' => 0,
-                'name' => trans_choice('general.invoices', 1),
                 'amount' => 0,
                 'currency_code' => setting('general.default_currency'),
                 'currency_rate' => 1
@@ -78,14 +63,6 @@ class IncomeExpenseSummary extends Controller
                 );
             }
 
-            $compares['expense'][0][$dates[$j]] = array(
-                'category_id' => 0,
-                'name' => trans_choice('general.invoices', 1),
-                'amount' => 0,
-                'currency_code' => setting('general.default_currency'),
-                'currency_rate' => 1
-            );
-
             foreach ($expense_categories as $category_id => $category_name) {
                 $compares['expense'][$category_id][$dates[$j]] = array(
                     'category_id' => $category_id,
@@ -97,49 +74,86 @@ class IncomeExpenseSummary extends Controller
             }
         }
 
-        // Invoices
+        $revenues = Revenue::monthsOfYear('paid_at')->account(request('accounts'))->customer(request('customers'))->isNotTransfer()->get();
+        $payments = Payment::monthsOfYear('paid_at')->account(request('accounts'))->vendor(request('vendors'))->isNotTransfer()->get();
+
         switch ($status) {
             case 'paid':
-                $invoices = InvoicePayment::monthsOfYear('paid_at')->get();
+                // Invoices
+                $invoices = InvoicePayment::monthsOfYear('paid_at')->account(request('accounts'))->get();
                 $this->setAmount($profit_graph, $totals, $compares, $invoices, 'invoice', 'paid_at');
-                break;
-            case 'upcoming':
-                $invoices = Invoice::accrued()->monthsOfYear('due_at')->get();
-                $this->setAmount($profit_graph, $totals, $compares, $invoices, 'invoice', 'due_at');
-                break;
-            default:
-                $invoices = Invoice::accrued()->monthsOfYear('invoiced_at')->get();
-                $this->setAmount($profit_graph, $totals, $compares, $invoices, 'invoice', 'invoiced_at');
-                break;
-        }
 
-        // Revenues
-        if ($status != 'upcoming') {
-            $revenues = Revenue::monthsOfYear('paid_at')->get();
-            $this->setAmount($profit_graph, $totals, $compares, $revenues, 'revenue', 'paid_at');
-        }
+                // Revenues
+                $this->setAmount($profit_graph, $totals, $compares, $revenues, 'revenue', 'paid_at');
 
-        // Bills
-        switch ($status) {
-            case 'paid':
-                $bills = BillPayment::monthsOfYear('paid_at')->get();
+                // Bills
+                $bills = BillPayment::monthsOfYear('paid_at')->account(request('accounts'))->get();
                 $this->setAmount($profit_graph, $totals, $compares, $bills, 'bill', 'paid_at');
+
+                // Payments
+                $this->setAmount($profit_graph, $totals, $compares, $payments, 'payment', 'paid_at');
                 break;
             case 'upcoming':
-                $bills = Bill::accrued()->monthsOfYear('due_at')->get();
+                // Invoices
+                $invoices = Invoice::accrued()->monthsOfYear('due_at')->customer(request('customers'))->get();
+                Recurring::reflect($invoices, 'invoice', 'due_at', $status);
+                $this->setAmount($profit_graph, $totals, $compares, $invoices, 'invoice', 'due_at');
+
+                // Revenues
+                Recurring::reflect($revenues, 'revenue', 'paid_at', $status);
+                $this->setAmount($profit_graph, $totals, $compares, $revenues, 'revenue', 'paid_at');
+
+                // Bills
+                $bills = Bill::accrued()->monthsOfYear('due_at')->vendor(request('vendors'))->get();
+                Recurring::reflect($bills, 'bill', 'billed_at', $status);
                 $this->setAmount($profit_graph, $totals, $compares, $bills, 'bill', 'due_at');
+
+                // Payments
+                Recurring::reflect($payments, 'payment', 'paid_at', $status);
+                $this->setAmount($profit_graph, $totals, $compares, $payments, 'payment', 'paid_at');
                 break;
             default:
-                $bills = Bill::accrued()->monthsOfYear('billed_at')->get();
+                // Invoices
+                $invoices = Invoice::accrued()->monthsOfYear('invoiced_at')->customer(request('customers'))->get();
+                Recurring::reflect($invoices, 'invoice', 'invoiced_at', $status);
+                $this->setAmount($profit_graph, $totals, $compares, $invoices, 'invoice', 'invoiced_at');
+
+                // Revenues
+                Recurring::reflect($revenues, 'revenue', 'paid_at', $status);
+                $this->setAmount($profit_graph, $totals, $compares, $revenues, 'revenue', 'paid_at');
+
+                // Bills
+                $bills = Bill::accrued()->monthsOfYear('billed_at')->vendor(request('vendors'))->get();
+                Recurring::reflect($bills, 'bill', 'billed_at', $status);
                 $this->setAmount($profit_graph, $totals, $compares, $bills, 'bill', 'billed_at');
+
+                // Payments
+                Recurring::reflect($payments, 'payment', 'paid_at', $status);
+                $this->setAmount($profit_graph, $totals, $compares, $payments, 'payment', 'paid_at');
                 break;
         }
-        
-        // Payments
-        if ($status != 'upcoming') {
-            $payments = Payment::monthsOfYear('paid_at')->get();
-            $this->setAmount($profit_graph, $totals, $compares, $payments, 'payment', 'paid_at');
+
+        $statuses = collect([
+            'all' => trans('general.all'),
+            'paid' => trans('invoices.paid'),
+            'upcoming' => trans('general.upcoming'),
+        ]);
+
+        $accounts = Account::enabled()->pluck('name', 'id')->toArray();
+        $customers = Customer::enabled()->pluck('name', 'id')->toArray();
+        $vendors = Vendor::enabled()->pluck('name', 'id')->toArray();
+        $categories = Category::enabled()->type(['income', 'expense'])->pluck('name', 'id')->toArray();
+
+        // Check if it's a print or normal request
+        if (request('print')) {
+            $chart_template = 'vendor.consoletvs.charts.chartjs.multi.line_print';
+            $view_template = 'reports.income_expense_summary.print';
+        } else {
+            $chart_template = 'vendor.consoletvs.charts.chartjs.multi.line';
+            $view_template = 'reports.income_expense_summary.index';
         }
+
+        $print_url = $this->getPrintUrl($year);
 
         // Profit chart
         $chart = Charts::multi('line', 'chartjs')
@@ -148,25 +162,74 @@ class IncomeExpenseSummary extends Controller
             ->dataset(trans_choice('general.profits', 1), $profit_graph)
             ->labels($dates)
             ->credits(false)
-            ->view('vendor.consoletvs.charts.chartjs.multi.line');
+            ->view($chart_template);
 
-        return view('reports.income_expense_summary.index', compact('chart', 'dates', 'income_categories', 'expense_categories', 'compares', 'totals'));
+        return view($view_template, compact(
+            'chart',
+            'dates',
+            'income_categories',
+            'expense_categories',
+            'categories',
+            'statuses',
+            'accounts',
+            'customers',
+            'vendors',
+            'compares',
+            'totals',
+            'print_url'
+        ));
     }
 
     private function setAmount(&$graph, &$totals, &$compares, $items, $type, $date_field)
     {
         foreach ($items as $item) {
-            $date = Date::parse($item->$date_field)->format('F');
+            if ($item->getTable() == 'bill_payments' || $item->getTable() == 'invoice_payments') {
+                $type_item = $item->$type;
 
-            if (($type == 'invoice') ||  ($type == 'bill')) {
-                $category_id = 0;
-            } else {
-                $category_id = $item->category_id;
+                $item->category_id = $type_item->category_id;
             }
 
-            $group = (($type == 'invoice') ||  ($type == 'revenue')) ? 'income' : 'expense';
+            switch ($item->getTable()) {
+                case 'invoice_payments':
+                    $invoice = $item->invoice;
 
-            if (!isset($compares[$group][$category_id])) {
+                    if ($customers = request('customers')) {
+                        if (!in_array($invoice->customer_id, $customers)) {
+                            continue;
+                        }
+                    }
+
+                    $item->category_id = $invoice->category_id;
+                    break;
+                case 'bill_payments':
+                    $bill = $item->bill;
+
+                    if ($vendors = request('vendors')) {
+                        if (!in_array($bill->vendor_id, $vendors)) {
+                            continue;
+                        }
+                    }
+
+                    $item->category_id = $bill->category_id;
+                    break;
+                case 'invoices':
+                case 'bills':
+                    if ($accounts = request('accounts')) {
+                        foreach ($item->payments as $payment) {
+                            if (!in_array($payment->account_id, $accounts)) {
+                                continue 2;
+                            }
+                        }
+                    }
+                    break;
+            }
+
+            $month = Date::parse($item->$date_field)->format('F');
+            $month_year = Date::parse($item->$date_field)->format('F-Y');
+
+            $group = (($type == 'invoice') || ($type == 'revenue')) ? 'income' : 'expense';
+
+            if (!isset($compares[$group][$item->category_id]) || !isset($compares[$group][$item->category_id][$month]) || !isset($graph[$month_year])) {
                 continue;
             }
 
@@ -179,19 +242,44 @@ class IncomeExpenseSummary extends Controller
                 }
             }
 
-            $compares[$group][$category_id][$date]['amount'] += $amount;
-            $compares[$group][$category_id][$date]['currency_code'] = $item->currency_code;
-            $compares[$group][$category_id][$date]['currency_rate'] = $item->currency_rate;
+            $compares[$group][$item->category_id][$month]['amount'] += $amount;
+            $compares[$group][$item->category_id][$month]['currency_code'] = $item->currency_code;
+            $compares[$group][$item->category_id][$month]['currency_rate'] = $item->currency_rate;
 
             if ($group == 'income') {
-                $graph[Date::parse($item->$date_field)->format('F-Y')] += $amount;
+                $graph[$month_year] += $amount;
 
-                $totals[$date]['amount'] += $amount;
+                $totals[$month]['amount'] += $amount;
             } else {
-                $graph[Date::parse($item->$date_field)->format('F-Y')] -= $amount;
+                $graph[$month_year] -= $amount;
 
-                $totals[$date]['amount'] -= $amount;
+                $totals[$month]['amount'] -= $amount;
             }
         }
+    }
+
+    private function getPrintUrl($year)
+    {
+        $print_url = 'reports/income-expense-summary?print=1'
+            . '&status=' . request('status')
+            . '&year='. request('year', $year);
+
+        collect(request('accounts'))->each(function($item) use(&$print_url) {
+            $print_url .= '&accounts[]=' . $item;
+        });
+
+        collect(request('customers'))->each(function($item) use(&$print_url) {
+            $print_url .= '&customers[]=' . $item;
+        });
+
+        collect(request('vendors'))->each(function($item) use(&$print_url) {
+            $print_url .= '&vendors[]=' . $item;
+        });
+
+        collect(request('categories'))->each(function($item) use(&$print_url) {
+            $print_url .= '&categories[]=' . $item;
+        });
+
+        return $print_url;
     }
 }

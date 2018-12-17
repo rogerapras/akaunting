@@ -21,6 +21,11 @@ return [
             'space'         => 'Espace ( )',
         ],
         'timezone'          => 'Fuseau horaire',
+        'percent' => [
+            'title'         => 'Position du signe "pourcentage" (%)',
+            'before'        => 'Avant le nombre',
+            'after'         => 'Après le nombre',
+        ],
     ],
     'invoice' => [
         'tab'               => 'Facture',
@@ -28,6 +33,16 @@ return [
         'digit'             => 'Nombre de chiffres',
         'next'              => 'Numéro suivant',
         'logo'              => 'Logo',
+        'custom'            => 'Personnalisé',
+        'item_name'         => 'Nom de l\'élément',
+        'item'              => 'Éléments',
+        'product'           => 'Produits',
+        'service'           => 'Services',
+        'price_name'        => 'Nom du prix',
+        'price'             => 'Prix',
+        'rate'              => 'Tarif',
+        'quantity_name'     => 'Nom de la quantité',
+        'quantity'          => 'Quantité',
     ],
     'default' => [
         'tab'               => 'Par défaut',
@@ -61,6 +76,8 @@ return [
         'bill_days'         => 'Envoyer avant les jours d\'échéance',
         'cron_command'      => 'Commande Cron',
         'schedule_time'     => 'Heure de fonctionnement',
+        'send_item_reminder'=> 'Envoyer un rappel pour l\'élément',
+        'item_stocks'       => 'Envoyer lorsque l\'élément approche la rupture de stock',
     ],
     'appearance' => [
         'tab'               => 'Apparence',

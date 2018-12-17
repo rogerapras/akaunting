@@ -5,7 +5,6 @@ namespace Database\Seeds;
 use App\Models\Model;
 use App\Models\Auth\Role;
 use App\Models\Auth\Permission;
-
 use Illuminate\Database\Seeder;
 
 class Roles extends Seeder
@@ -34,10 +33,11 @@ class Roles extends Seeder
                 'auth-roles' => 'c,r,u,d',
                 'auth-permissions' => 'c,r,u,d',
                 'auth-profile' => 'r,u',
-                'companies-companies' => 'c,r,u,d',
+                'common-companies' => 'c,r,u,d',
                 'common-import' => 'c',
+                'common-items' => 'c,r,u,d',
                 'common-uploads' => 'd',
-                'items-items' => 'c,r,u,d',
+                'common-notifications' => 'c,r,u,d',
                 'incomes-invoices' => 'c,r,u,d',
                 'incomes-revenues' => 'c,r,u,d',
                 'incomes-customers' => 'c,r,u,d',
@@ -47,6 +47,7 @@ class Roles extends Seeder
                 'banking-accounts' => 'c,r,u,d',
                 'banking-transfers' => 'c,r,u,d',
                 'banking-transactions' => 'r',
+                'banking-reconciliations' => 'c,r,u,d',
                 'settings-categories' => 'c,r,u,d',
                 'settings-settings' => 'r,u',
                 'settings-taxes' => 'c,r,u,d',
@@ -56,18 +57,26 @@ class Roles extends Seeder
                 'modules-tiles' => 'r',
                 'modules-item' => 'c,r,u,d',
                 'modules-token' => 'c,u',
+                'modules-my' => 'r',
                 'install-updates' => 'r,u',
                 'notifications' => 'r,u',
                 'reports-income-summary' => 'r',
                 'reports-expense-summary' => 'r',
                 'reports-income-expense-summary' => 'r',
+                'reports-profit-loss' => 'r',
+                'reports-tax-summary' => 'r',
+                'wizard-companies' => 'c,r,u',
+                'wizard-currencies' => 'c,r,u',
+                'wizard-taxes' => 'c,r,u',
+                'wizard-finish' => 'c,r,u',
             ],
             'manager' => [
                 'admin-panel' => 'r',
                 'auth-profile' => 'r,u',
-                'companies-companies' => 'c,r,u,d',
+                'common-companies' => 'c,r,u,d',
                 'common-import' => 'c',
-                'items-items' => 'c,r,u,d',
+                'common-items' => 'c,r,u,d',
+                'common-notifications' => 'c,r,u,d',
                 'incomes-invoices' => 'c,r,u,d',
                 'incomes-revenues' => 'c,r,u,d',
                 'incomes-customers' => 'c,r,u,d',
@@ -77,6 +86,7 @@ class Roles extends Seeder
                 'banking-accounts' => 'c,r,u,d',
                 'banking-transfers' => 'c,r,u,d',
                 'banking-transactions' => 'r',
+                'banking-reconciliations' => 'c,r,u,d',
                 'settings-settings' => 'r,u',
                 'settings-categories' => 'c,r,u,d',
                 'settings-taxes' => 'c,r,u,d',
@@ -87,6 +97,8 @@ class Roles extends Seeder
                 'reports-income-summary' => 'r',
                 'reports-expense-summary' => 'r',
                 'reports-income-expense-summary' => 'r',
+                'reports-profit-loss' => 'r',
+                'reports-tax-summary' => 'r',
             ],
             'customer' => [
                 'customer-panel' => 'r',

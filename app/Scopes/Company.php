@@ -18,11 +18,6 @@ class Company implements Scope
      */
     public function apply(Builder $builder, Model $model)
     {
-        // Session not available in console
-        if (App::runningInConsole()) {
-            return;
-        }
-
         $table = $model->getTable();
 
         // Skip for specific tables
@@ -37,9 +32,7 @@ class Company implements Scope
         }
 
         // Apply company scope
-        $company_id = session('company_id');
-
-        $builder->where($table . '.company_id', '=', $company_id);
+        $builder->where($table . '.company_id', '=', session('company_id'));
     }
 
     /**

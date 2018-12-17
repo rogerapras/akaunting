@@ -12,10 +12,15 @@ return [
     'quantity'          => 'Cantidad',
     'price'             => 'Precio',
     'sub_total'         => 'Subtotal',
+    'discount'          => 'Descuento',
     'tax_total'         => 'Total Impuestos',
     'total'             => 'Total ',
 
     'item_name'         => 'Nombre del artículo | Nombres de artículo',
+
+    'show_discount'     => ':discount% Descuento',
+    'add_discount'      => 'Agregar Descuento',
+    'discount_desc'     => 'de subtotal',
 
     'payment_due'       => 'Vencimiento de pago',
     'amount_due'        => 'Importe Vencido',
@@ -36,6 +41,18 @@ return [
 
     'messages' => [
         'received'      => 'Recibo marcado como recibido con éxito!',
+        'draft'          => 'Este es un recibo <b>BORRADOR</b> y se reflejará en los gráficos luego de recibirse.',
+
+        'status' => [
+            'created'   => 'Creado el :date',
+            'receive'      => [
+                'draft'     => 'No enviado',
+                'received'  => 'Recibido el :date',
+            ],
+            'paid'      => [
+                'await'     => 'Pendiente de pago',
+            ],
+        ],
     ],
 
 ];

@@ -18,7 +18,23 @@ class Taxes extends Controller
     {
         $taxes = Tax::collect();
 
-        return view('settings.taxes.index', compact('taxes', 'rates'));
+        $types = [
+            'normal' => trans('taxes.normal'),
+            'inclusive' => trans('taxes.inclusive'),
+            'compound' => trans('taxes.compound'),
+        ];
+
+        return view('settings.taxes.index', compact('taxes', 'types'));
+    }
+
+    /**
+     * Show the form for viewing the specified resource.
+     *
+     * @return Response
+     */
+    public function show()
+    {
+        return redirect('settings/taxes');
     }
 
     /**
@@ -28,7 +44,13 @@ class Taxes extends Controller
      */
     public function create()
     {
-        return view('settings.taxes.create');
+        $types = [
+            'normal' => trans('taxes.normal'),
+            'inclusive' => trans('taxes.inclusive'),
+            'compound' => trans('taxes.compound'),
+        ];
+
+        return view('settings.taxes.create', compact('types'));
     }
 
     /**
@@ -58,7 +80,13 @@ class Taxes extends Controller
      */
     public function edit(Tax $tax)
     {
-        return view('settings.taxes.edit', compact('tax'));
+        $types = [
+            'normal' => trans('taxes.normal'),
+            'inclusive' => trans('taxes.inclusive'),
+            'compound' => trans('taxes.compound'),
+        ];
+
+        return view('settings.taxes.edit', compact('tax', 'types'));
     }
 
     /**
@@ -92,6 +120,58 @@ class Taxes extends Controller
 
             return redirect('settings/taxes/' . $tax->id . '/edit');
         }
+    }
+
+    /**
+     * Enable the specified resource.
+     *
+     * @param  Tax  $tax
+     *
+     * @return Response
+     */
+    public function enable(Tax $tax)
+    {
+        $tax->enabled = 1;
+        $tax->save();
+
+        $message = trans('messages.success.enabled', ['type' => trans_choice('general.tax_rates', 1)]);
+
+        flash($message)->success();
+
+        return redirect()->route('taxes.index');
+    }
+
+    /**
+     * Disable the specified resource.
+     *
+     * @param  Tax  $tax
+     *
+     * @return Response
+     */
+    public function disable(Tax $tax)
+    {
+        $relationships = $this->countRelationships($tax, [
+            'items' => 'items',
+            'invoice_items' => 'invoices',
+            'bill_items' => 'bills',
+        ]);
+
+        if (empty($relationships)) {
+            $tax->enabled = 0;
+            $tax->save();
+
+            $message = trans('messages.success.disabled', ['type' => trans_choice('general.tax_rates', 1)]);
+
+            flash($message)->success();
+        } else {
+            $message = trans('messages.warning.disabled', ['name' => $tax->name, 'text' => implode(', ', $relationships)]);
+
+            flash($message)->warning();
+
+            return redirect()->route('taxes.index');
+        }
+
+        return redirect()->route('taxes.index');
     }
 
     /**

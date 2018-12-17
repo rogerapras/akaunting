@@ -33,7 +33,7 @@
                     <tr>
                         <th class="col-md-4">@sortablelink('name', trans('general.name'))</th>
                         <th class="col-md-3 hidden-xs">@sortablelink('number', trans('accounts.number'))</th>
-                        <th class="col-md-3">@sortablelink('opening_balance', trans('accounts.current_balance'))</th>
+                        <th class="col-md-3 text-right amount-space">@sortablelink('opening_balance', trans('accounts.current_balance'))</th>
                         <th class="col-md-1 hidden-xs">@sortablelink('enabled', trans_choice('general.statuses', 1))</th>
                         <th class="col-md-1 text-center">{{ trans('general.actions') }}</th>
                     </tr>
@@ -41,9 +41,13 @@
                 <tbody>
                 @foreach($accounts as $item)
                     <tr>
-                        <td><a href="{{ url('banking/accounts/' . $item->id . '/edit') }}">{{ $item->name }}</a></td>
+                        @if ($auth_user->can('read-reports-income-expense-summary'))
+                        <td><a href="{{ url('reports/income-expense-summary?accounts[]=' . $item->id) }}">{{ $item->name }}</a></td>
+                        @else
+                        <td><a href="{{ route('accounts.edit', $item->id) }}">{{ $item->name }}</a></td>
+                        @endif
                         <td class="hidden-xs">{{ $item->number }}</td>
-                        <td>@money($item->balance, $item->currency_code, true)</td>
+                        <td class="text-right amount-space">@money($item->balance, $item->currency_code, true)</td>
                         <td class="hidden-xs">
                             @if ($item->enabled)
                                 <span class="label label-success">{{ trans('general.enabled') }}</span>
@@ -57,8 +61,14 @@
                                     <i class="fa fa-ellipsis-h"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-right">
-                                    <li><a href="{{ url('banking/accounts/' . $item->id . '/edit') }}">{{ trans('general.edit') }}</a></li>
+                                    <li><a href="{{ route('accounts.edit', $item->id) }}">{{ trans('general.edit') }}</a></li>
+                                    @if ($item->enabled)
+                                    <li><a href="{{ route('accounts.disable', $item->id) }}">{{ trans('general.disable') }}</a></li>
+                                    @else
+                                    <li><a href="{{ route('accounts.enable', $item->id) }}">{{ trans('general.enable') }}</a></li>
+                                    @endif
                                     @permission('delete-banking-accounts')
+                                    <li class="divider"></li>
                                     <li>{!! Form::deleteLink($item, 'banking/accounts') !!}</li>
                                     @endpermission
                                 </ul>

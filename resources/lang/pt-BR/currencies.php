@@ -5,14 +5,14 @@ return [
     'code'                  => 'Código',
     'rate'                  => 'Taxa',
     'default'               => 'Moeda Padrão',
-    'decimal_mark'          => 'Decimal Mark',
-    'thousands_separator'   => 'Thousands Separator',
-    'precision'             => 'Precision',
+    'decimal_mark'          => 'Separador de decimal',
+    'thousands_separator'   => 'Separador de milhar',
+    'precision'             => 'Precisão',
     'symbol' => [
-        'symbol'            => 'Symbol',
-        'position'          => 'Symbol Position',
-        'before'            => 'Before Amount',
-        'after'             => 'After Amount',
+        'symbol'            => 'Símbolo',
+        'position'          => 'Posição do símbolo',
+        'before'            => 'Antes do valor',
+        'after'             => 'Depois do valor',
     ]
 
 ];

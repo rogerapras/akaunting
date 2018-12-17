@@ -5,9 +5,12 @@ namespace App\Http\ViewComposers;
 use Auth;
 use App\Utilities\Updater;
 use Illuminate\View\View;
+use App\Traits\Modules as RemoteModules;
 
 class Header
 {
+    use RemoteModules;
+
     /**
      * Bind data to the view.
      *
@@ -21,6 +24,7 @@ class Header
         $bills = [];
         $invoices = [];
         $items = [];
+        $items_reminder = [];
         $notifications = 0;
         $company = null;
 
@@ -48,8 +52,12 @@ class Header
                     $invoices[$data['invoice_id']] = $data['amount'];
                     $notifications++;
                     break;
-                case 'App\Notifications\Item\Item':
+                case 'App\Notifications\Common\Item':
                     $items[$data['item_id']] = $data['name'];
+                    $notifications++;
+                    break;
+                case 'App\Notifications\Common\ItemReminder':
+                    $items_reminder[$data['item_id']] = $data['name'];
                     $notifications++;
                     break;
             }
@@ -57,12 +65,15 @@ class Header
 
         $updates = count(Updater::all());
 
+        $this->loadSuggestions();
+
         $view->with([
             'user' => $user,
             'notifications' => $notifications,
             'bills' => $bills,
             'invoices' => $invoices,
             'items' => $items,
+            'items_reminder' => $items_reminder,
             'company' => $company,
             'updates' => $updates,
         ]);

@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Routing\Route;
-use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Routing\Route;
 
 class Controller extends BaseController
 {
@@ -14,34 +15,44 @@ class Controller extends BaseController
 
     /**
      * Instantiate a new controller instance.
-     *
-     * @param  Route  $route
      */
-    public function __construct(Route $route)
+    public function __construct()
     {
+        // No need to check for permission in console
+        if (app()->runningInConsole()) {
+            return;
+        }
+
+        $route = app(Route::class);
+
         // Get the controller array
         $arr = array_reverse(explode('\\', explode('@', $route->getAction()['uses'])[0]));
 
         $controller = '';
 
         // Add folder
-        if ($arr[1] != 'controllers') {
+        if (strtolower($arr[1]) != 'controllers') {
             $controller .= kebab_case($arr[1]) . '-';
+        }
+
+        // Add module
+        if (isset($arr[3]) && isset($arr[4]) && (strtolower($arr[4]) == 'modules')) {
+            $controller .= kebab_case($arr[3]) . '-';
         }
 
         // Add file
         $controller .= kebab_case($arr[0]);
 
         // Skip ACL
-        $skip = ['dashboard-dashboard', 'customers-dashboard'];
+        $skip = ['common-dashboard', 'customers-dashboard'];
         if (in_array($controller, $skip)) {
             return;
         }
 
         // Add CRUD permission check
         $this->middleware('permission:create-' . $controller)->only(['create', 'store', 'duplicate', 'import']);
-        $this->middleware('permission:read-' . $controller)->only(['index', 'show', 'edit']);
-        $this->middleware('permission:update-' . $controller)->only(['update']);
+        $this->middleware('permission:read-' . $controller)->only(['index', 'show', 'edit', 'export']);
+        $this->middleware('permission:update-' . $controller)->only(['update', 'enable', 'disable']);
         $this->middleware('permission:delete-' . $controller)->only('destroy');
     }
 
@@ -70,5 +81,32 @@ class Controller extends BaseController
         }
 
         redirect('apps/token/create')->send();
+    }
+
+    /**
+     * Mass delete relationships with events being fired.
+     *
+     * @param  $model
+     * @param  $relationships
+     *
+     * @return void
+     */
+    public function deleteRelationships($model, $relationships)
+    {
+        foreach ((array) $relationships as $relationship) {
+            if (empty($model->$relationship)) {
+                continue;
+            }
+
+            $items = $model->$relationship->all();
+
+            if ($items instanceof Collection) {
+                $items = $items->all();
+            }
+
+            foreach ((array) $items as $item) {
+                $item->delete();
+            }
+        }
     }
 }

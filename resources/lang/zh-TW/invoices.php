@@ -12,10 +12,15 @@ return [
     'quantity'          => '數量',
     'price'             => '售價',
     'sub_total'         => '小計',
+    'discount'          => '折扣',
     'tax_total'         => '稅額',
     'total'             => '總計',
 
     'item_name'         => '產品名稱 | 產品名稱',
+
+    'show_discount'     => ':discount% 折扣',
+    'add_discount'      => '新增折扣',
+    'discount_desc'     => '小計',
 
     'payment_due'       => '付款到期日',
     'paid'              => '已付款',
@@ -26,6 +31,7 @@ return [
     'mark_sent'         => '標記為已傳送',
     'download_pdf'      => '下載 PDF格式',
     'send_mail'         => '傳送電子郵件',
+    'all_invoices'      => '登錄以查看所有發票',
 
     'status' => [
         'draft'         => '草稿',
@@ -37,8 +43,21 @@ return [
     ],
 
     'messages' => [
-        'email_sent'    => '成功傳送帳單郵件！',
-        'marked_sent'   => '成功標記帳單為已傳送！',
+        'email_sent'     => '成功傳送帳單郵件！',
+        'marked_sent'    => '成功標記帳單為已傳送！',
+        'email_required' => '此客戶沒有電子郵件地址！',
+        'draft'          => '這是 <b>草稿</b> 發票, 在簽收後將反映在圖表上。',
+
+        'status' => [
+            'created'   => '創建於 :date',
+            'send'      => [
+                'draft'     => '未發送',
+                'sent'      => '發送於 :date',
+            ],
+            'paid'      => [
+                'await'     => '等待付款',
+            ],
+        ],
     ],
 
     'notification' => [

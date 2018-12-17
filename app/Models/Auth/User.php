@@ -11,13 +11,13 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laratrust\Traits\LaratrustUserTrait;
 use Kyslik\ColumnSortable\Sortable;
-use Plank\Mediable\Mediable;
+use App\Traits\Media;
 use Request;
 use Route;
 
 class User extends Authenticatable
 {
-    use Filterable, LaratrustUserTrait, Notifiable, SoftDeletes, Sortable, Mediable;
+    use Filterable, LaratrustUserTrait, Notifiable, SoftDeletes, Sortable, Media;
 
     protected $table = 'users';
 
@@ -51,7 +51,7 @@ class User extends Authenticatable
 
     public function companies()
     {
-        return $this->morphToMany('App\Models\Company\Company', 'user', 'user_companies', 'user_id', 'company_id');
+        return $this->morphToMany('App\Models\Common\Company', 'user', 'user_companies', 'user_id', 'company_id');
     }
 
     public function customer()
@@ -177,7 +177,7 @@ class User extends Authenticatable
         $input = $request->input();
         $limit = $request->get('limit', setting('general.list_limit', '25'));
 
-        return $this->filter($input)->sortable($sort)->paginate($limit);
+        return $query->filter($input)->sortable($sort)->paginate($limit);
     }
 
     /**

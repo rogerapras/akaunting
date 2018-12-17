@@ -3,7 +3,7 @@
 namespace App\Utilities;
 
 use DB;
-use App\Models\Company\Company;
+use App\Models\Common\Company;
 
 class Info
 {
@@ -25,7 +25,7 @@ class Info
     {
         $data = static::versions();
 
-        $data['token'] = setting('general.token');
+        $data['token'] = setting('general.api_token');
 
         $data['companies'] = Company::all()->count();
 
@@ -36,9 +36,14 @@ class Info
     {
         return phpversion();
     }
-
+  
     public static function mysqlVersion()
     {
-        return DB::selectOne('select version() as mversion')->mversion;
+        if(env('DB_CONNECTION') === 'mysql')
+        {
+            return DB::selectOne('select version() as mversion')->mversion;
+        }
+
+        return "N/A";
     }
 }

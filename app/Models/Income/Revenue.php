@@ -3,24 +3,29 @@
 namespace App\Models\Income;
 
 use App\Models\Model;
+use App\Models\Setting\Category;
 use App\Traits\Currencies;
 use App\Traits\DateTime;
+use App\Traits\Media;
+use App\Traits\Recurring;
 use Bkwld\Cloner\Cloneable;
 use Sofa\Eloquence\Eloquence;
-use Plank\Mediable\Mediable;
+use Date;
 
 class Revenue extends Model
 {
-    use Cloneable, Currencies, DateTime, Eloquence, Mediable;
+    use Cloneable, Currencies, DateTime, Eloquence, Media, Recurring;
 
     protected $table = 'revenues';
+
+    protected $dates = ['deleted_at', 'paid_at'];
 
     /**
      * Attributes that should be mass-assignable.
      *
      * @var array
      */
-    protected $fillable = ['company_id', 'account_id', 'paid_at', 'amount', 'currency_code', 'currency_rate', 'customer_id', 'description', 'category_id', 'payment_method', 'reference'];
+    protected $fillable = ['company_id', 'account_id', 'paid_at', 'amount', 'currency_code', 'currency_rate', 'customer_id', 'description', 'category_id', 'payment_method', 'reference', 'parent_id'];
 
     /**
      * Sortable columns.
@@ -41,6 +46,13 @@ class Revenue extends Model
         'customer_email' => 5,
         'notes'          => 2,
     ];
+
+    /**
+     * Clonable relationships.
+     *
+     * @var array
+     */
+    public $cloneable_relations = ['recurring'];
 
     public function user()
     {
@@ -67,9 +79,36 @@ class Revenue extends Model
         return $this->belongsTo('App\Models\Income\Customer');
     }
 
+    public function recurring()
+    {
+        return $this->morphOne('App\Models\Common\Recurring', 'recurable');
+    }
+
     public function transfers()
     {
         return $this->hasMany('App\Models\Banking\Transfer');
+    }
+
+    /**
+     * Get only transfers.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeIsTransfer($query)
+    {
+        return $query->where('category_id', '=', Category::transfer());
+    }
+
+    /**
+     * Skip transfers.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeIsNotTransfer($query)
+    {
+        return $query->where('category_id', '<>', Category::transfer());
     }
 
     /**

@@ -13,11 +13,15 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        Commands\CompanySeed::class,
         Commands\BillReminder::class,
+        Commands\CompanySeed::class,
+        Commands\Install::class,
         Commands\InvoiceReminder::class,
+        Commands\ModuleDelete::class,
+        Commands\ModuleDisable::class,
+        Commands\ModuleEnable::class,
         Commands\ModuleInstall::class,
-        Commands\ConfigureApp::class,
+        Commands\RecurringCheck::class,
     ];
 
     /**
@@ -35,6 +39,7 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('reminder:invoice')->dailyAt(setting('general.schedule_time', '09:00'));
         $schedule->command('reminder:bill')->dailyAt(setting('general.schedule_time', '09:00'));
+        $schedule->command('recurring:check')->dailyAt(setting('general.schedule_time', '09:00'));
     }
 
     /**

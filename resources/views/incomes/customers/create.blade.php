@@ -5,7 +5,7 @@
 @section('content')
     <!-- Default box -->
     <div class="box box-success">
-        {!! Form::open(['url' => 'incomes/customers', 'role' => 'form']) !!}
+        {!! Form::open(['url' => 'incomes/customers', 'role' => 'form', 'class' => 'form-loading-button']) !!}
 
         <div class="box-body">
             {{ Form::textGroup('name', trans('general.name'), 'id-card-o') }}
@@ -24,13 +24,14 @@
 
             {{ Form::radioGroup('enabled', trans('general.enabled')) }}
 
-            <div class="form-group col-md-12 margin-top">
+            {{ Form::textGroup('reference', trans('general.reference'), 'file-text-o', []) }}
+
+
+            @stack('create_user_input_start')
+            <div id="customer-create-user" class="form-group col-md-12 margin-top">
                 <strong>{{ trans('customers.allow_login') }}</strong> &nbsp;  {{ Form::checkbox('create_user', '1', null, ['id' => 'create_user']) }}
             </div>
-
-            {{ Form::passwordGroup('password', trans('auth.password.current'), 'key', [], null, 'col-md-6 password hidden') }}
-
-            {{ Form::passwordGroup('password_confirmation', trans('auth.password.current_confirm'), 'key', [], null, 'col-md-6 password hidden') }}
+            @stack('create_user_input_end')
         </div>
         <!-- /.box-body -->
 
@@ -75,7 +76,7 @@
                 $('input[name="user_id"]').remove();
 
                 if ($(this).prop('checked')) {
-                    $('.col-md-6.password').addClass('hidden');
+                    $('.col-md-6.password').remove();
 
                     $('input[name="email"]').parent().parent().removeClass('has-error');
                     $('input[name="email"]').parent().parent().find('.help-block').remove();
@@ -83,9 +84,14 @@
                     var email = $('input[name="email"]').val();
 
                     if (!email) {
+                        $('input[name="email"]').parent().parent().removeClass('has-error');
+                        $('input[name="email"]').parent().parent().find('.help-block').remove();
+
                         $('input[name="email"]').parent().parent().addClass('has-error');
                         $('input[name="email"]').parent().after('<p class="help-block">{{ trans('validation.required', ['attribute' => 'email']) }}</p>');
                         $('input[name="email"]').focus();
+
+                        unselect();
 
                         return false;
                     }
@@ -96,13 +102,12 @@
                         dataType: 'JSON',
                         data: {column: 'email', value: email},
                         beforeSend: function() {
+                            $('.iCheck-helper').parent().after('<i class="fa fa-spinner fa-pulse fa-fw loading" style="margin-left: 10px;"></i>');
+
                             $('input[name="email"]').parent().parent().removeClass('has-error');
                             $('input[name="email"]').parent().parent().find('.help-block').remove();
 
                             $('.box-footer .btn').attr('disabled', true);
-                        },
-                        complete: function() {
-                            $('.box-footer .btn').attr('disabled', false);
                         },
                         success: function(json) {
                             if (json['errors']) {
@@ -114,16 +119,48 @@
                                     return false;
                                 }
 
-                                $('.col-md-6.password').removeClass('hidden');
+                                fields = [];
+
+                                fields[0] = 'password';
+                                fields[1] = 'password_confirmation';
+
+                                $.ajax({
+                                    url: '{{ url("incomes/customers/field") }}',
+                                    type: 'POST',
+                                    dataType: 'JSON',
+                                    data: {fields: fields},
+                                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                                    complete: function() {
+                                        $('.box-footer .btn').attr('disabled', false);
+                                        $('.loading').remove();
+                                    },
+                                    success: function(json) {
+                                        $('#customer-create-user').after(json['html']);
+                                    }
+                                });
                             }
 
                             if (json['success']) {
-                                $('input[name="password_confirmation"]').after('<input name="user_id" type="hidden" value="' + json['data']['id'] + '" id="user-id">');
+                                unselect();
+                                $('input[name="email"]').parent().parent().addClass('has-error');
+                                $('input[name="email"]').parent().after('<p class="help-block">{{ trans('customers.error.email') }}</p>');
+                                $('input[name="email"]').focus();
+
+                                $('.box-footer .btn').attr('disabled', false);
+                                $('.loading').remove();
+
+                                return false;
                             }
                         }
                     });
                 }
             });
         });
+
+        function unselect() {
+            setTimeout(function(){
+                $('#create_user').iCheck('uncheck');
+            }, 550);
+        }
     </script>
 @endpush

@@ -26,6 +26,7 @@ return [
     'companies'             => 'Company|Companies',
     'profits'               => 'Profit|Profits',
     'taxes'                 => 'Tax|Taxes',
+    'logos'                 => 'Logo|Logos',
     'pictures'              => 'Picture|Pictures',
     'types'                 => 'Type|Types',
     'payment_methods'       => 'Payment Method|Payment Methods',
@@ -36,6 +37,10 @@ return [
     'updates'               => 'Update|Updates',
     'numbers'               => 'Number|Numbers',
     'statuses'              => 'Status|Statuses',
+    'others'                => 'Other|Others',
+    'contacts'              => 'Contact|Contacts',
+    'reconciliations'       => 'Reconciliation|Reconciliations',
+    'developers'            => 'Developer|Developers',
 
     'dashboard'             => 'Dashboard',
     'banking'               => 'Banking',
@@ -79,6 +84,7 @@ return [
     'color'                 => 'Colour',
     'save'                  => 'Save',
     'cancel'                => 'Cancel',
+    'loading'               => 'Loading...',
     'from'                  => 'From',
     'to'                    => 'To',
     'print'                 => 'Print',
@@ -98,11 +104,30 @@ return [
     'overdue'               => 'Overdue',
     'partially'             => 'Partially',
     'partially_paid'        => 'Partially Paid',
+    'export'                => 'Export',
+    'finish'                => 'Finish',
+    'wizard'                => 'Wizard',
+    'skip'                  => 'Skip',
+    'enable'                => 'Enable',
+    'disable'               => 'Disable',
+    'select_all'            => 'Select All',
+    'unselect_all'          => 'Unselect All',
+    'go_to'                 => 'Go to :name',
+    'created_date'          => 'Created Date',
+    'period'                => 'Period',
+    'start'                 => 'Start',
+    'end'                   => 'End',
+    'clear'                 => 'Clear',
+    'difference'            => 'Difference',
 
     'title' => [
         'new'               => 'New :type',
         'edit'              => 'Edit :type',
+        'create'            => 'Create :type',
+        'send'              => 'Send :type',
+        'get'               => 'Get :type',
     ],
+
     'form' => [
         'enter'             => 'Enter :field',
         'select' => [
@@ -112,4 +137,11 @@ return [
         'no_file_selected'  => 'No file selected...',
     ],
 
+    'date_range' => [
+        'today' => 'Today',
+        'yesterday' => 'Yesterday',
+        'last_days' => 'Last :day Days',
+        'this_month' => 'This Month',
+        'last_month' => 'Last Month',
+    ],
 ];

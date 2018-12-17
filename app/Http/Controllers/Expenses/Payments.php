@@ -10,6 +10,7 @@ use App\Models\Expense\Vendor;
 use App\Models\Setting\Category;
 use App\Models\Setting\Currency;
 use App\Traits\Uploads;
+use App\Utilities\Import;
 use App\Utilities\ImportFile;
 use App\Utilities\Modules;
 
@@ -24,20 +25,27 @@ class Payments extends Controller
      */
     public function index()
     {
-        $payments = Payment::with(['vendor', 'account', 'category'])->collect(['paid_at'=> 'desc']);
+        $payments = Payment::with(['vendor', 'account', 'category'])->isNotTransfer()->collect(['paid_at'=> 'desc']);
 
-        $vendors = collect(Vendor::enabled()->pluck('name', 'id'))
-            ->prepend(trans('general.all_type', ['type' => trans_choice('general.vendors', 2)]), '');
+        $vendors = collect(Vendor::enabled()->orderBy('name')->pluck('name', 'id'));
 
-        $categories = collect(Category::enabled()->type('expense')->pluck('name', 'id'))
-            ->prepend(trans('general.all_type', ['type' => trans_choice('general.categories', 2)]), '');
+        $categories = collect(Category::enabled()->type('expense')->orderBy('name')->pluck('name', 'id'));
 
-        $accounts = collect(Account::enabled()->pluck('name', 'id'))
-            ->prepend(trans('general.all_type', ['type' => trans_choice('general.accounts', 2)]), '');
+        $accounts = collect(Account::enabled()->orderBy('name')->pluck('name', 'id'));
 
         $transfer_cat_id = Category::transfer();
 
         return view('expenses.payments.index', compact('payments', 'vendors', 'categories', 'accounts', 'transfer_cat_id'));
+    }
+
+    /**
+     * Show the form for viewing the specified resource.
+     *
+     * @return Response
+     */
+    public function show()
+    {
+        return redirect('expenses/payments');
     }
 
     /**
@@ -47,19 +55,21 @@ class Payments extends Controller
      */
     public function create()
     {
-        $accounts = Account::enabled()->pluck('name', 'id');
+        $accounts = Account::enabled()->orderBy('name')->pluck('name', 'id');
 
-        $currencies = Currency::enabled()->pluck('name', 'code')->toArray();
+        $currencies = Currency::enabled()->orderBy('name')->pluck('name', 'code')->toArray();
 
         $account_currency_code = Account::where('id', setting('general.default_account'))->pluck('currency_code')->first();
 
-        $vendors = Vendor::enabled()->pluck('name', 'id');
+        $currency = Currency::where('code', $account_currency_code)->first();
 
-        $categories = Category::enabled()->type('expense')->pluck('name', 'id');
+        $vendors = Vendor::enabled()->orderBy('name')->pluck('name', 'id');
+
+        $categories = Category::enabled()->type('expense')->orderBy('name')->pluck('name', 'id');
 
         $payment_methods = Modules::getPaymentMethods();
 
-        return view('expenses.payments.create', compact('accounts', 'currencies', 'account_currency_code', 'vendors', 'categories', 'payment_methods'));
+        return view('expenses.payments.create', compact('accounts', 'currencies', 'account_currency_code', 'currency', 'vendors', 'categories', 'payment_methods'));
     }
 
     /**
@@ -71,12 +81,6 @@ class Payments extends Controller
      */
     public function store(Request $request)
     {
-        // Get currency object
-        $currency = Currency::where('code', $request['currency_code'])->first();
-
-        $request['currency_code'] = $currency->code;
-        $request['currency_rate'] = $currency->rate;
-
         $payment = Payment::create($request->input());
 
         // Upload attachment
@@ -85,6 +89,9 @@ class Payments extends Controller
         if ($media) {
             $payment->attachMedia($media, 'attachment');
         }
+
+        // Recurring
+        $payment->createRecurring();
 
         $message = trans('messages.success.added', ['type' => trans_choice('general.payments', 1)]);
 
@@ -120,13 +127,8 @@ class Payments extends Controller
      */
     public function import(ImportFile $import)
     {
-        $rows = $import->all();
-
-        foreach ($rows as $row) {
-            $data = $row->toArray();
-            $data['company_id'] = session('company_id');
-
-            Payment::create($data);
+        if (!Import::createFromFile($import, 'Expense\Payment')) {
+            return redirect('common/import/expenses/payments');
         }
 
         $message = trans('messages.success.imported', ['type' => trans_choice('general.payments', 2)]);
@@ -145,19 +147,19 @@ class Payments extends Controller
      */
     public function edit(Payment $payment)
     {
-        $accounts = Account::enabled()->pluck('name', 'id');
+        $accounts = Account::enabled()->orderBy('name')->pluck('name', 'id');
 
-        $currencies = Currency::enabled()->pluck('name', 'code')->toArray();
+        $currencies = Currency::enabled()->orderBy('name')->pluck('name', 'code')->toArray();
 
-        $account_currency_code = Account::where('id', $payment->account_id)->pluck('currency_code')->first();
+        $currency = Currency::where('code', $payment->currency_code)->first();
 
-        $vendors = Vendor::enabled()->pluck('name', 'id');
+        $vendors = Vendor::enabled()->orderBy('name')->pluck('name', 'id');
 
-        $categories = Category::enabled()->type('expense')->pluck('name', 'id');
+        $categories = Category::enabled()->type('expense')->orderBy('name')->pluck('name', 'id');
 
         $payment_methods = Modules::getPaymentMethods();
 
-        return view('expenses.payments.edit', compact('payment', 'accounts', 'currencies', 'account_currency_code', 'vendors', 'categories', 'payment_methods'));
+        return view('expenses.payments.edit', compact('payment', 'accounts', 'currencies', 'currency', 'vendors', 'categories', 'payment_methods'));
     }
 
     /**
@@ -170,12 +172,6 @@ class Payments extends Controller
      */
     public function update(Payment $payment, Request $request)
     {
-        // Get currency object
-        $currency = Currency::where('code', $request['currency_code'])->first();
-
-        $request['currency_code'] = $currency->code;
-        $request['currency_rate'] = $currency->rate;
-
         $payment->update($request->input());
 
         // Upload attachment
@@ -184,6 +180,9 @@ class Payments extends Controller
 
             $payment->attachMedia($media, 'attachment');
         }
+
+        // Recurring
+        $payment->updateRecurring();
 
         $message = trans('messages.success.updated', ['type' => trans_choice('general.payments', 1)]);
 
@@ -206,6 +205,7 @@ class Payments extends Controller
             return redirect('expenses/payments');
         }
 
+        $payment->recurring()->delete();
         $payment->delete();
 
         $message = trans('messages.success.deleted', ['type' => trans_choice('general.payments', 1)]);
@@ -213,5 +213,21 @@ class Payments extends Controller
         flash($message)->success();
 
         return redirect('expenses/payments');
+    }
+
+    /**
+     * Export the specified resource.
+     *
+     * @return Response
+     */
+    public function export()
+    {
+        \Excel::create('payments', function($excel) {
+            $excel->sheet('payments', function($sheet) {
+                $sheet->fromModel(Payment::filter(request()->input())->get()->makeHidden([
+                    'id', 'company_id', 'parent_id', 'created_at', 'updated_at', 'deleted_at'
+                ]));
+            });
+        })->download('xlsx');
     }
 }

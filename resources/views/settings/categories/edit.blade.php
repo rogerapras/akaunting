@@ -8,14 +8,21 @@
         {!! Form::model($category, [
             'method' => 'PATCH',
             'url' => ['settings/categories', $category->id],
-            'role' => 'form'
+            'role' => 'form',
+            'class' => 'form-loading-button'
         ]) !!}
 
         <div class="box-body">
             {{ Form::textGroup('name', trans('general.name'), 'id-card-o') }}
 
-            {{ Form::selectGroup('type', trans_choice('general.types', 1), 'bars', ['expense' => 'Expense', 'income' => 'Income', 'item' => 'Item', 'other' => 'Other'], config('general.types')) }}
+            @if ($type_disabled)
+                {{ Form::selectGroup('type', trans_choice('general.types', 1), 'bars', $types, null, ['required' => 'required', 'disabled' => 'disabled']) }}
+                <input type="hidden" name="type" value="{{ $category->type }}" />
+            @else
+                {{ Form::selectGroup('type', trans_choice('general.types', 1), 'bars', $types) }}
+            @endif
 
+            @stack('color_input_start')
             <div class="form-group col-md-6 required {{ $errors->has('color') ? 'has-error' : ''}}">
                 {!! Form::label('color', trans('general.color'), ['class' => 'control-label']) !!}
                 <div  id="category-color-picker" class="input-group colorpicker-component">
@@ -24,6 +31,7 @@
                 </div>
                 {!! $errors->first('color', '<p class="help-block">:message</p>') !!}
             </div>
+            @stack('color_input_end')
 
             {{ Form::radioGroup('enabled', trans('general.enabled')) }}
         </div>

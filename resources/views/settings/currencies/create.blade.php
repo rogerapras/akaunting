@@ -5,7 +5,7 @@
 @section('content')
     <!-- Default box -->
     <div class="box box-success">
-    {!! Form::open(['url' => 'settings/currencies', 'role' => 'form']) !!}
+    {!! Form::open(['url' => 'settings/currencies', 'role' => 'form', 'class' => 'form-loading-button']) !!}
 
     <div class="box-body">
         {{ Form::textGroup('name', trans('general.name'), 'id-card-o') }}
@@ -14,7 +14,7 @@
 
         {{ Form::textGroup('rate', trans('currencies.rate'), 'money') }}
 
-        {{ Form::textGroup('precision', trans('currencies.precision'), 'bullseye') }}
+        {{ Form::numberGroup('precision', trans('currencies.precision'), 'bullseye') }}
 
         {{ Form::textGroup('symbol', trans('currencies.symbol.symbol'), 'font') }}
 

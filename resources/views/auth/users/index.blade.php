@@ -43,8 +43,12 @@
                     <tr>
                         <td>
                             <a href="{{ url('auth/users/' . $item->id . '/edit') }}">
+                                @if (setting('general.use_gravatar', '0') == '1')
+                                    <img src="{{ $item->picture }}" class="users-image" alt="{{ $item->name }}" title="{{ $item->name }}">
+                                @else
                                 @if ($item->picture)
-                                <img src="{{ Storage::url($item->picture->id) }}" class="users-image" alt="{{ $item->name }}" title="{{ $item->name }}">
+                                    <img src="{{ Storage::url($item->picture->id) }}" class="users-image" alt="{{ $item->name }}" title="{{ $item->name }}">
+                                @endif
                                 @endif
                                 {{ $item->name }}
                             </a>
@@ -68,8 +72,13 @@
                                     <i class="fa fa-ellipsis-h"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-right">
-                                    <li><a href="{{ url('auth/users/' . $item->id . '/edit') }}">{{ trans('general.edit') }}</a></li>
+                                    <li><a href="{{ url('auth/users/' . $item->id . '/edit') }}">{{ trans('general.edit') }}</a></li>@if ($item->enabled)
+                                    <li><a href="{{ route('users.disable', $item->id) }}">{{ trans('general.disable') }}</a></li>
+                                    @else
+                                    <li><a href="{{ route('users.enable', $item->id) }}">{{ trans('general.enable') }}</a></li>
+                                    @endif
                                     @permission('delete-auth-users')
+                                    <li class="divider"></li>
                                     <li>{!! Form::deleteLink($item, 'auth/users') !!}</li>
                                     @endpermission
                                 </ul>

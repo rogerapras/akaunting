@@ -6,7 +6,7 @@ return [
     'refresh'               => 'Обновить',
 
     'steps' => [
-        'requirements'      => 'Пожалуйста, ознакомьтесь со следующими требованиями!',
+        'requirements'      => 'Please, ask your hosting provider to fix the errors!',
         'language'          => 'Шаг 1/3: Выбор языка',
         'database'          => 'Шаг 2/3: Настройка базы данных',
         'settings'          => 'Шаг 3/3: Компании и данные Администратора',
@@ -17,10 +17,9 @@ return [
     ],
 
     'requirements' => [
-        'php_version'       => 'Требуется PHP 5.6.4 или выше!',
         'enabled'           => ':feature должно быть включено!',
         'disabled'          => ':feature должно быть отключено!',
-        'extension'         => ':extension расширение должно быть загружено!',
+        'extension'         => ':extension extension needs to be installed and loaded!',
         'directory'         => ':directory директория должна быть доступна для записи!',
     ],
 

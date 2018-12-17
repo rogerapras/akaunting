@@ -12,10 +12,15 @@ return [
     'quantity'          => 'Quantidade',
     'price'             => 'Preço',
     'sub_total'         => 'Subtotal',
+    'discount'          => 'Desconto',
     'tax_total'         => 'Taxa',
     'total'             => 'Total',
 
     'item_name'         => 'Nome(s) do(s) Item(s)',
+
+    'show_discount'     => ':discount% desconto',
+    'add_discount'      => 'Adicionar desconto',
+    'discount_desc'     => 'subtotal',
 
     'payment_due'       => 'Valor Devido',
     'amount_due'        => 'Total Devido',
@@ -36,6 +41,18 @@ return [
 
     'messages' => [
         'received'      => 'Conta marcada como recebida com sucesso!',
+        'draft'          => 'This is a <b>DRAFT</b> bill and will be reflected to charts after it gets received.',
+
+        'status' => [
+            'created'   => 'Criado em :date',
+            'receive'      => [
+                'draft'     => 'Não enviado',
+                'received'  => 'Recebido em :date',
+            ],
+            'paid'      => [
+                'await'     => 'Aguardando pagamento',
+            ],
+        ],
     ],
 
 ];

@@ -3,16 +3,19 @@
 namespace App\Models\Income;
 
 use App\Models\Model;
+use App\Models\Setting\Currency;
 use App\Traits\Currencies;
 use App\Traits\DateTime;
 use App\Traits\Incomes;
+use App\Traits\Media;
+use App\Traits\Recurring;
 use Bkwld\Cloner\Cloneable;
 use Sofa\Eloquence\Eloquence;
-use Plank\Mediable\Mediable;
+use Date;
 
 class Invoice extends Model
 {
-    use Cloneable, Currencies, DateTime, Eloquence, Incomes, Mediable;
+    use Cloneable, Currencies, DateTime, Eloquence, Incomes, Media, Recurring;
 
     protected $table = 'invoices';
 
@@ -21,7 +24,7 @@ class Invoice extends Model
      *
      * @var array
      */
-    protected $appends = ['attachment'];
+    protected $appends = ['attachment', 'discount', 'paid'];
 
     protected $dates = ['deleted_at', 'invoiced_at', 'due_at'];
 
@@ -30,14 +33,14 @@ class Invoice extends Model
      *
      * @var array
      */
-    protected $fillable = ['company_id', 'invoice_number', 'order_number', 'invoice_status_code', 'invoiced_at', 'due_at', 'amount', 'currency_code', 'currency_rate', 'customer_id', 'customer_name', 'customer_email', 'customer_tax_number', 'customer_phone', 'customer_address', 'notes'];
+    protected $fillable = ['company_id', 'invoice_number', 'order_number', 'invoice_status_code', 'invoiced_at', 'due_at', 'amount', 'currency_code', 'currency_rate', 'customer_id', 'customer_name', 'customer_email', 'customer_tax_number', 'customer_phone', 'customer_address', 'notes', 'category_id', 'parent_id'];
 
     /**
      * Sortable columns.
      *
      * @var array
      */
-    public $sortable = ['invoice_number', 'customer_name', 'amount', 'status' , 'invoiced_at', 'due_at'];
+    public $sortable = ['invoice_number', 'customer_name', 'amount', 'status' , 'invoiced_at', 'due_at', 'invoice_status_code'];
 
     /**
      * Searchable rules.
@@ -54,16 +57,18 @@ class Invoice extends Model
         'notes'            => 2,
     ];
 
+    protected $reconciled_amount = [];
+
     /**
      * Clonable relationships.
      *
      * @var array
      */
-    protected $cloneable_relations = ['items', 'totals'];
+    public $cloneable_relations = ['items', 'recurring', 'totals'];
 
-    public function customer()
+    public function category()
     {
-        return $this->belongsTo('App\Models\Income\Customer');
+        return $this->belongsTo('App\Models\Setting\Category');
     }
 
     public function currency()
@@ -71,9 +76,9 @@ class Invoice extends Model
         return $this->belongsTo('App\Models\Setting\Currency', 'currency_code', 'code');
     }
 
-    public function status()
+    public function customer()
     {
-        return $this->belongsTo('App\Models\Income\InvoiceStatus', 'invoice_status_code', 'code');
+        return $this->belongsTo('App\Models\Income\Customer');
     }
 
     public function items()
@@ -81,14 +86,9 @@ class Invoice extends Model
         return $this->hasMany('App\Models\Income\InvoiceItem');
     }
 
-    public function totals()
+    public function itemTaxes()
     {
-        return $this->hasMany('App\Models\Income\InvoiceTotal');
-    }
-
-    public function payments()
-    {
-        return $this->hasMany('App\Models\Income\InvoicePayment');
+        return $this->hasMany('App\Models\Income\InvoiceItemTax');
     }
 
     public function histories()
@@ -96,9 +96,29 @@ class Invoice extends Model
         return $this->hasMany('App\Models\Income\InvoiceHistory');
     }
 
+    public function payments()
+    {
+        return $this->hasMany('App\Models\Income\InvoicePayment');
+    }
+
+    public function recurring()
+    {
+        return $this->morphOne('App\Models\Common\Recurring', 'recurable');
+    }
+
+    public function status()
+    {
+        return $this->belongsTo('App\Models\Income\InvoiceStatus', 'invoice_status_code', 'code');
+    }
+
+    public function totals()
+    {
+        return $this->hasMany('App\Models\Income\InvoiceTotal');
+    }
+
     public function scopeDue($query, $date)
     {
-        return $query->where('due_at', '=', $date);
+        return $query->whereDate('due_at', '=', $date);
     }
 
     public function scopeLatest($query)
@@ -108,7 +128,17 @@ class Invoice extends Model
 
     public function scopeAccrued($query)
     {
-        return $query->where('invoice_status_code', '!=', 'draft');
+        return $query->where('invoice_status_code', '<>', 'draft');
+    }
+
+    public function scopePaid($query)
+    {
+        return $query->where('invoice_status_code', '=', 'paid');
+    }
+
+    public function scopeNotPaid($query)
+    {
+        return $query->where('invoice_status_code', '<>', 'paid');
     }
 
     public function onCloning($src, $child = null)
@@ -153,5 +183,80 @@ class Invoice extends Model
         }
 
         return $this->getMedia('attachment')->last();
+    }
+
+    /**
+     * Get the discount percentage.
+     *
+     * @return string
+     */
+    public function getDiscountAttribute()
+    {
+        $percent = 0;
+
+        $discount = $this->totals()->where('code', 'discount')->value('amount');
+
+        if ($discount) {
+            $sub_total = $this->totals()->where('code', 'sub_total')->value('amount');
+
+            $percent = number_format((($discount * 100) / $sub_total), 0);
+        }
+
+        return $percent;
+    }
+
+    /**
+     * Get the paid amount.
+     *
+     * @return string
+     */
+    public function getPaidAttribute()
+    {
+        if (empty($this->amount)) {
+            return false;
+        }
+
+        $paid = 0;
+        $reconciled = $reconciled_amount = 0;
+
+        if ($this->payments->count()) {
+            $currencies = Currency::enabled()->pluck('rate', 'code')->toArray();
+
+            foreach ($this->payments as $item) {
+                if ($this->currency_code == $item->currency_code) {
+                    $amount = (double) $item->amount;
+                } else {
+                    $default_model = new InvoicePayment();
+                    $default_model->default_currency_code = $this->currency_code;
+                    $default_model->amount = $item->amount;
+                    $default_model->currency_code = $item->currency_code;
+                    $default_model->currency_rate = $currencies[$item->currency_code];
+
+                    $default_amount = (double) $default_model->getDivideConvertedAmount();
+
+                    $convert_model = new InvoicePayment();
+                    $convert_model->default_currency_code = $item->currency_code;
+                    $convert_model->amount = $default_amount;
+                    $convert_model->currency_code = $this->currency_code;
+                    $convert_model->currency_rate = $currencies[$this->currency_code];
+
+                    $amount = (double) $convert_model->getDynamicConvertedAmount();
+                }
+
+                $paid += $amount;
+
+                if ($item->reconciled) {
+                    $reconciled_amount = +$amount;
+                }
+            }
+        }
+
+        if ($this->amount == $reconciled_amount) {
+            $reconciled = 1;
+        }
+
+        $this->setAttribute('reconciled', $reconciled);
+
+        return $paid;
     }
 }

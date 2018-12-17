@@ -12,10 +12,15 @@ return [
     'quantity'          => 'Sasia',
     'price'             => 'Çmimi',
     'sub_total'         => 'Nëntotali',
+    'discount'          => 'Skonto',
     'tax_total'         => 'Tatimi Gjithsej',
     'total'             => 'Totali',
 
     'item_name'         => 'Emri i Artikullit | Emrat e Artikullit',
+
+    'show_discount'     => ':discount% Skonto',
+    'add_discount'      => 'Shto Skonto',
+    'discount_desc'     => 'e nëntotalit',
 
     'payment_due'       => 'Pagesa e Duhur',
     'amount_due'        => 'Shuma e Duhur',
@@ -36,6 +41,18 @@ return [
 
     'messages' => [
         'received'      => 'Fatura shënohet si i marrë me sukses!',
+        'draft'          => 'Ky është një faturë <b>DRAFT</b> dhe do të pasqyrohet në skema pas marrjes së tij.',
+
+        'status' => [
+            'created'   => 'Krijuar më :date',
+            'receive'      => [
+                'draft'     => 'Nuk është dërguar',
+                'received'  => 'Pranuar më :date',
+            ],
+            'paid'      => [
+                'await'     => 'Duke pritur pagesen',
+            ],
+        ],
     ],
 
 ];

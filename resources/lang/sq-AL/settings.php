@@ -21,6 +21,11 @@ return [
             'space'         => 'Hapësirë ( )',
         ],
         'timezone'          => 'Zona Kohore',
+        'percent' => [
+            'title'         => 'Pozicioni Përqindja (%)',
+            'before'        => 'Para Numrit',
+            'after'         => 'Pas Numrit',
+        ],
     ],
     'invoice' => [
         'tab'               => 'Faturë',
@@ -28,6 +33,16 @@ return [
         'digit'             => 'Gjatësia a numrit',
         'next'              => 'Numri tjetër',
         'logo'              => 'Logoja',
+        'custom'            => 'Special',
+        'item_name'         => 'Emri i artikullit',
+        'item'              => 'Artikujt',
+        'product'           => 'Produktet',
+        'service'           => 'Shërbimet',
+        'price_name'        => 'Emri i çmimit',
+        'price'             => 'Çmimi',
+        'rate'              => 'Normë',
+        'quantity_name'     => 'Emri i sasisë',
+        'quantity'          => 'Sasia',
     ],
     'default' => [
         'tab'               => 'Parazgjedhjet',
@@ -61,6 +76,8 @@ return [
         'bill_days'         => 'Dërgo Para Ditëve të Duhura',
         'cron_command'      => 'Komanda Cron',
         'schedule_time'     => 'Ora për të Kandiduar',
+        'send_item_reminder'=> 'Dërgo Artikullin Rikujtimor',
+        'item_stocks'       => 'Dërgo Kur Artikulli në Stok',
     ],
     'appearance' => [
         'tab'               => 'Pamja',

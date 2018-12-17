@@ -4,35 +4,63 @@ return [
 
     'title'                 => 'API Token',
     'api_token'             => 'Token',
+    'my_apps'               => 'Meine Apps',
     'top_paid'              => 'Top bezahlt',
     'new'                   => 'Neu',
     'top_free'              => 'Top kostenlos',
     'free'                  => 'Kostenlos',
+    'search'                => 'Suchen',
     'install'               => 'Installieren',
     'buy_now'               => 'Jetzt kaufen',
-    'faq'                   => 'Häufige Fragen / FAQ',
-    'changelog'             => 'Changelog',
-    'installed'             => 'Installiert',
-    'uninstalled'           => 'Deinstalliert',
     'token_link'            => '<a href="https://akaunting.com/tokens" target="_blank">Hier klicken</a> um Ihren API Token zu erhalten.',
+    'no_apps'               => 'Bisher existieren noch keine Apps in dieser Kategorie.',
+    'developer'             => 'Sind sie ein Entwickler? <a href="https://akaunting.com/blog/akaunting-app-store" target="_blank">Hier</a> lernen Sie wie Sie eine App erzeugen und verkaufen können!',
 
-    'enabled'               => 'Anwendung  :module aktiviert',
-    'disabled'              => 'Anwendung :module deaktiviert',
+    'recommended_apps'      => 'Empfohlene Apps',
 
-    'installation' => [
-        'header'            => 'Modulinstallation',
-        'start'             => ':module wird installiert.',
-        'download'          => 'Lade :module Dateien herunter.',
-        'unzip'             => 'Extrahiere :module Dateien.',
-        'install'           => 'Lade :module Dateien hoch.',
+    'about'                 => 'Über',
+
+    'added'                 => 'Hinzugefügt',
+    'updated'               => 'Aktualisiert',
+    'compatibility'         => 'Kompatibilität',
+    'documentation'         => 'Dokumentation',
+    'view'                  => 'Ansicht',
+    'back'                  => 'Zurück',
+
+    'installed'             => ':module installiert',
+    'uninstalled'           => ':module deinstalliert',
+    //'updated'               => ':module updated',
+    'enabled'               => ':module aktiviert',
+    'disabled'              => ':module deaktiviert',
+
+    'tab' => [
+        'installation'      => 'Installation',
+        'faq'               => 'Häufige Fragen / FAQ',
+        'changelog'         => 'Changelog',
+        'reviews'            => 'Rezensionen',
     ],
 
-    'history' => [
-        'installed'         => ':module installiert',
-        'uninstalled'       => ':module deinstallieren',
-        'updated'           => ':module aktualisiert',
-        'enabled'           => ':module aktiviert',
-        'disabled'          => ':module deaktiviert',
+    'installation' => [
+        'header'            => 'App Installation',
+        'download'          => 'Lade :module Dateien herunter.',
+        'unzip'             => 'Extrahiere :module Dateien.',
+        'file_copy'         => ':module Dateien werden kopiert.',
+        'migrate'           => ':module wird geupdated.',
+        'finish'            => 'Das Update wurde erfolgreich installiert. Sie werden zum Update Center weiterleiten.',
+        'install'           => 'Installiere :module Dateien.',
+    ],
+
+    'errors' => [
+        'download' => ':module kann nicht heruntergeladen werden!',
+        'upload' => 'Heruntergeladenes Modul :module konnte nicht gespeichert werden!',
+        'unzip' => ':module kann nicht entpackt werden!',
+        'file_copy' => ':module Dateien können nicht kopiert werden!',
+        'migrate' => ':module Migration fehlerhaft!',
+        'migrate core' => ':module bereits auf der neuesten Version, Aktualisierung nicht nötig.',
+    ],
+
+    'badge' => [
+        'installed' => 'Installiert',
     ],
 
     'button' => [
@@ -40,4 +68,16 @@ return [
         'disable'           => 'Deaktivieren',
         'enable'            => 'Aktivieren',
     ],
+
+    'my' => [
+        'purchased' => 'Gekauft',
+        'installed' => 'Installiert',
+    ],
+
+    'reviews' => [
+        'button' => [
+            'add' => 'Eine Rezension verfassen'
+        ],
+        'na' => 'Es existieren noch keine Rezensionen.'
+    ]
 ];

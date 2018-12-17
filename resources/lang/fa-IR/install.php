@@ -6,7 +6,7 @@ return [
     'refresh'               => 'تازه سازی',
 
     'steps' => [
-        'requirements'      => 'لطفا نیازمندی های نصب را بررسی کنید!',
+        'requirements'      => 'Please, ask your hosting provider to fix the errors!',
         'language'          => 'گام 1/3: انتخاب زبان',
         'database'          => 'مرحله 2/3: راه اندازی پایگاه داده',
         'settings'          => 'مرحله 3/3: شرکت و مدیریت اطلاعات',
@@ -17,10 +17,9 @@ return [
     ],
 
     'requirements' => [
-        'php_version'       => 'پی اچ پی 5.6.4 یا بالاتر نیاز به استفاده شود!',
         'enabled'           => ':feature باید فعال باشد!',
         'disabled'          => ':feature باید غیر فعال باشد!',
-        'extension'         => ':extension باید بارگذاری شود!',
+        'extension'         => ':extension extension needs to be installed and loaded!',
         'directory'         => ':directory باید فابل نوشتن باشد!',
     ],
 

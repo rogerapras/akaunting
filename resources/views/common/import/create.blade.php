@@ -4,19 +4,21 @@
 
 @section('content')
     <div class="box box-success">
-        {!! Form::open(['url' => $path . '/import', 'files' => true, 'role' => 'form']) !!}
+        {!! Form::open(['url' => $path . '/import', 'files' => true, 'role' => 'form', 'class' => 'form-loading-button']) !!}
 
         <div class="box-body">
             <div class="col-md-12">
                 <div class="alert alert-info alert-important">
-                    {!! trans('import.message', ['link' => url('public/files/import/' . $type . '.csv')]) !!}
+                    {!! trans('import.message', ['link' => url('public/files/import/' . $type . '.xlsx')]) !!}
                 </div>
             </div>
+            @stack('import_input_start')
             <div class="form-group col-md-12 required {{ $errors->has('import') ? 'has-error' : '' }}" style="min-height: 59px">
                 {!! Form::label('import', trans('general.form.select.file'), ['class' => 'control-label']) !!}
                 {!! Form::file('import', null, ['class' => 'form-control']) !!}
                 {!! $errors->first('import', '<p class="help-block">:message</p>') !!}
             </div>
+            @stack('import_input_end')
         </div>
         <!-- /.box-body -->
 

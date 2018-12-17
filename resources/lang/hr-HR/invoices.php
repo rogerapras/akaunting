@@ -12,10 +12,15 @@ return [
     'quantity'          => 'Količina',
     'price'             => 'Cijena',
     'sub_total'         => 'Podzbroj',
+    'discount'          => 'Popust',
     'tax_total'         => 'Porez Ukupno',
     'total'             => 'Ukupno',
 
     'item_name'         => 'Ime stavke|Imena stavaka',
+
+    'show_discount'     => ':discount% popusta',
+    'add_discount'      => 'Dodaj popust',
+    'discount_desc'     => 'od podzbroja',
 
     'payment_due'       => 'Dospijeća plaćanja',
     'paid'              => 'Plaćeno',
@@ -26,6 +31,7 @@ return [
     'mark_sent'         => 'Označi kao poslano',
     'download_pdf'      => 'Preuzmite PDF',
     'send_mail'         => 'Pošalji e-mail',
+    'all_invoices'      => 'Login to view all invoices',
 
     'status' => [
         'draft'         => 'Skica',
@@ -37,8 +43,21 @@ return [
     ],
 
     'messages' => [
-        'email_sent'    => 'E-mail računa je uspješno poslan!',
-        'marked_sent'   => 'Račun je uspješno označen kao poslan!',
+        'email_sent'     => 'E-mail računa je uspješno poslan!',
+        'marked_sent'    => 'Račun je uspješno označen kao poslan!',
+        'email_required' => 'Nema e-mail adrese za ovog kupca!',
+        'draft'          => 'This is a <b>DRAFT</b> invoice and will be reflected to charts after it gets sent.',
+
+        'status' => [
+            'created'   => 'Kreirano :date',
+            'send'      => [
+                'draft'     => 'Not sent',
+                'sent'      => 'Sent on :date',
+            ],
+            'paid'      => [
+                'await'     => 'Awaiting payment',
+            ],
+        ],
     ],
 
     'notification' => [

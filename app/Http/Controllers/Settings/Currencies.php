@@ -23,6 +23,16 @@ class Currencies extends Controller
     }
 
     /**
+     * Show the form for viewing the specified resource.
+     *
+     * @return Response
+     */
+    public function show()
+    {
+        return redirect('settings/currencies');
+    }
+
+    /**
      * Show the form for creating a new resource.
      *
      * @return Response
@@ -116,8 +126,8 @@ class Currencies extends Controller
      */
     public function update(Currency $currency, Request $request)
     {
-        // Check if we can disable it
-        if (!$request['enabled']) {
+        // Check if we can disable or change the code
+        if (!$request['enabled'] || ($currency->code != $request['code'])) {
             $relationships = $this->countRelationships($currency, [
                 'accounts' => 'accounts',
                 'customers' => 'customers',
@@ -152,12 +162,71 @@ class Currencies extends Controller
 
             return redirect('settings/currencies');
         } else {
-            $message = trans('messages.warning.disabled', ['name' => $currency->name, 'text' => implode(', ', $relationships)]);
+            $message = trans('messages.warning.disable_code', ['name' => $currency->name, 'text' => implode(', ', $relationships)]);
 
             flash($message)->warning();
 
             return redirect('settings/currencies/' . $currency->id . '/edit');
         }
+    }
+
+    /**
+     * Enable the specified resource.
+     *
+     * @param  Currency  $currency
+     *
+     * @return Response
+     */
+    public function enable(Currency $currency)
+    {
+        $currency->enabled = 1;
+        $currency->save();
+
+        $message = trans('messages.success.enabled', ['type' => trans_choice('general.currencies', 1)]);
+
+        flash($message)->success();
+
+        return redirect()->route('currencies.index');
+    }
+
+    /**
+     * Disable the specified resource.
+     *
+     * @param  Currency  $currency
+     *
+     * @return Response
+     */
+    public function disable(Currency $currency)
+    {
+        $relationships = $this->countRelationships($currency, [
+            'accounts' => 'accounts',
+            'customers' => 'customers',
+            'invoices' => 'invoices',
+            'revenues' => 'revenues',
+            'bills' => 'bills',
+            'payments' => 'payments',
+        ]);
+
+        if ($currency->code == setting('general.default_currency')) {
+            $relationships[] = strtolower(trans_choice('general.companies', 1));
+        }
+
+        if (empty($relationships)) {
+            $currency->enabled = 0;
+            $currency->save();
+
+            $message = trans('messages.success.disabled', ['type' => trans_choice('general.currencies', 1)]);
+
+            flash($message)->success();
+        } else {
+            $message = trans('messages.warning.disabled', ['name' => $currency->name, 'text' => implode(', ', $relationships)]);
+
+            flash($message)->warning();
+
+            return redirect()->route('currencies.index');
+        }
+
+        return redirect()->route('currencies.index');
     }
 
     /**
@@ -201,16 +270,15 @@ class Currencies extends Controller
     {
         $json = new \stdClass();
 
-        $account_id = request('account_id');
+        $code = request('code');
 
-        if ($account_id) {
-            $currencies = Currency::enabled()->pluck('name', 'code')->toArray();
+        // Get currency object
+        $currency = Currency::where('code', $code)->first();
 
-            $json->currency_code = Account::where('id', $account_id)->pluck('currency_code')->first();
-            $json->currency_name = $currencies[$json->currency_code];
-        }
+        // it should be integer for amount mask
+        $currency->precision = (int) $currency->precision;
 
-        return response()->json($json);
+        return response()->json($currency);
     }
 
     public function config()

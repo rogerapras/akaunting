@@ -2,14 +2,17 @@
 
 return [
 
-    'quantities'            => 'الكمية | الكميات',
+    'quantities'            => 'الكمية|الكميات',
     'sales_price'           => 'سعر البيع',
     'purchase_price'        => 'سعر الشراء',
-    'sku'                   => 'الرمز التعريفى',
+    'sku'                   => 'رمز SKU',
 
     'notification' => [
-        'message'       => 'تتلقى هذة الرسالة حيث ان : المنتج اسم المنتج نفذ من المخزن.',
-        'button'        => 'عرض الأن',
+        'message'       => [
+            'reminder' => 'You are receiving this email because only :quantity of :name has remained.',
+            'out_of_stock' => 'You are receiving this email because the :name is running out of stock.',
+        ],
+        'button'        => 'عرض الآن',
     ],
 
 ];

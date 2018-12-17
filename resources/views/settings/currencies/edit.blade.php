@@ -8,7 +8,8 @@
         {!! Form::model($currency, [
             'method' => 'PATCH',
             'url' => ['settings/currencies', $currency->id],
-            'role' => 'form'
+            'role' => 'form',
+            'class' => 'form-loading-button'
         ]) !!}
 
         <div class="box-body">
@@ -18,7 +19,7 @@
 
             {{ Form::textGroup('rate', trans('currencies.rate'), 'money') }}
 
-            {{ Form::textGroup('precision', trans('currencies.precision'), 'bullseye') }}
+            {{ Form::numberGroup('precision', trans('currencies.precision'), 'bullseye') }}
 
             {{ Form::textGroup('symbol', trans('currencies.symbol.symbol'), 'font') }}
 

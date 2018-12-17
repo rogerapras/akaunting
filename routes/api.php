@@ -2,13 +2,13 @@
 
 $api = app('Dingo\Api\Routing\Router');
 
-$api->version('v1', ['middleware' => ['api.auth', 'api.company', 'throttle:60,1', 'bindings', 'permission:read-api']], function($api) {
+$api->version('v1', ['middleware' => ['api']], function($api) {
     $api->group(['namespace' => 'App\Http\Controllers\Api'], function($api) {
         // Companies
-        $api->resource('companies', 'Companies\Companies');
+        $api->resource('companies', 'Common\Companies');
 
         // Items
-        $api->resource('items', 'Items\Items');
+        $api->resource('items', 'Common\Items');
 
         // Incomes
         $api->resource('customers', 'Incomes\Customers');

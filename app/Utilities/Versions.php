@@ -6,6 +6,7 @@ use App\Traits\SiteApi;
 use Cache;
 use Date;
 use Parsedown;
+use GuzzleHttp\Exception\RequestException;
 
 class Versions
 {
@@ -71,13 +72,6 @@ class Versions
 
         $data['core'] = static::getLatestVersion($url);
 
-        // API token required for modules
-        if (!setting('general.api_token')) {
-            Cache::put('versions', $data, Date::now()->addHour(6));
-
-            return $data;
-        }
-
         // Then modules
         foreach ($modules as $module) {
             $alias = $module->get('alias');
@@ -97,10 +91,15 @@ class Versions
     {
         $latest = '0.0.0';
 
-        $response = static::getRemote($url, ['timeout' => 30, 'referer' => true]);
+        $response = static::getRemote($url, ['timeout' => 10, 'referer' => true]);
+
+        // Exception
+        if ($response instanceof RequestException) {
+            return $latest;
+        }
 
         // Bad response
-        if ($response->getStatusCode() != 200) {
+        if (!$response || ($response->getStatusCode() != 200)) {
             return $latest;
         }
 

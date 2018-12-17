@@ -26,6 +26,7 @@ return [
     'companies'             => 'Kompania | Kompanitë',
     'profits'               => 'Fitimi | Fitimet',
     'taxes'                 => 'Tatim | Tatimet',
+    'logos'                 => 'Logo | Logot',
     'pictures'              => 'Foto | Fotografitë',
     'types'                 => 'Lloji | Llojet',
     'payment_methods'       => 'Metoda e Pagesës | Metodat e Pagesës',
@@ -36,6 +37,9 @@ return [
     'updates'               => 'Përditësimi | Përditësimet',
     'numbers'               => 'Numri | Numrat',
     'statuses'              => 'Statusi | Statuset',
+    'others'                => 'Tjetër | Të tjera',
+    'contacts'              => 'Kontakti | Kontaktet',
+    'reconciliations'       => 'Pajtimi | Pajtimet',
 
     'dashboard'             => 'Paneli Kryesor',
     'banking'               => 'Veprime Bankare',
@@ -79,6 +83,7 @@ return [
     'color'                 => 'Ngjyra',
     'save'                  => 'Ruaj',
     'cancel'                => 'Anulo',
+    'loading'               => 'Në ngarkim…',
     'from'                  => 'Nga',
     'to'                    => 'Te',
     'print'                 => 'Printo',
@@ -93,11 +98,35 @@ return [
     'id'                    => 'ID',
     'more_actions'          => 'Më shumë Veprime',
     'duplicate'             => 'Dublo',
+    'unpaid'                => 'I papaguar',
+    'paid'                  => 'I paguar',
+    'overdue'               => 'I vonuar',
+    'partially'             => 'Pjesërisht',
+    'partially_paid'        => 'I paguar pjesërisht',
+    'export'                => 'Eksporto',
+    'finish'                => 'Përfundo',
+    'wizard'                => 'Magjistar',
+    'skip'                  => 'Anashkalo',
+    'enable'                => 'Aktivizo',
+    'disable'               => 'Çaktivizo',
+    'select_all'            => 'Zgjidh të gjitha',
+    'unselect_all'          => 'Hiqni të gjithë',
+    'go_to'                 => 'Shko te :name',
+    'created_date'          => 'Data e Krijuar',
+    'period'                => 'Periudhë',
+    'start'                 => 'Fillo',
+    'end'                   => 'Përfundo',
+    'clear'                 => 'Pastro',
+    'difference'            => 'Diferencë',
 
     'title' => [
         'new'               => 'I ri :type',
         'edit'              => 'Modifiko :type',
+        'create'            => 'Krijo :type',
+        'send'              => 'Dërgo :type',
+        'get'               => 'Merr :type',
     ],
+
     'form' => [
         'enter'             => 'Shkruaj :field',
         'select' => [
@@ -107,4 +136,11 @@ return [
         'no_file_selected'  => 'Asnjë skedar i përzgjedhur...',
     ],
 
+    'date_range' => [
+        'today' => 'Sot',
+        'yesterday' => 'Dje',
+        'last_days' => ':day Ditët e Fundit',
+        'this_month' => 'Këtë Muaj',
+        'last_month' => 'Muaji i Shkuar',
+    ],
 ];

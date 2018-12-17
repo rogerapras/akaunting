@@ -6,7 +6,7 @@ return [
     'refresh'               => 'Atualizar',
 
     'steps' => [
-        'requirements'      => 'Por favor, verifque os seguintes pré-requisitos!',
+        'requirements'      => 'Por favor, consulte o seu provedor de hospedagem para corrigir os erros!',
         'language'          => 'Passo 1/3 : Selecionar idioma',
         'database'          => 'Passo 2/3 : Configuração do Banco de Dados',
         'settings'          => 'Passo 3/3 : Detalhes da empresa e do administrador',
@@ -17,10 +17,9 @@ return [
     ],
 
     'requirements' => [
-        'php_version'       => 'PHP 5.6.4 ou superior!',
         'enabled'           => ':feature precisa esta habilitado!',
         'disabled'          => ':feature precisa esta desabilitado!',
-        'extension'         => 'A :extension precisa esta instalada!',
+        'extension'         => 'Extensão :extension precisa ser instalado e carregado!',
         'directory'         => 'O diretório :directory precisa de permissão para escrita!',
     ],
 

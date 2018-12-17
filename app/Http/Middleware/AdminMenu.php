@@ -41,9 +41,9 @@ class AdminMenu
             ]);
 
             // Items
-            if ($user->can('read-items-items')) {
+            if ($user->can('read-common-items')) {
                 $menu->add([
-                    'url' => 'items/items',
+                    'url' => 'common/items',
                     'title' => trans_choice('general.items', 2),
                     'icon' => 'fa fa-cubes',
                     'order' => 2,
@@ -70,7 +70,7 @@ class AdminMenu
                 ]);
             }
 
-            // Expences
+            // Expenses
             if ($user->can(['read-expenses-bills', 'read-expenses-payments', 'read-expenses-vendors'])) {
                 $menu->dropdown(trans_choice('general.expenses', 2), function ($sub) use($user, $attr) {
                     if ($user->can('read-expenses-bills')) {
@@ -91,7 +91,7 @@ class AdminMenu
             }
 
             // Banking
-            if ($user->can(['read-banking-accounts', 'read-banking-transfers', 'read-banking-transactions'])) {
+            if ($user->can(['read-banking-accounts', 'read-banking-transfers', 'read-banking-transactions', 'read-banking-reconciliations'])) {
                 $menu->dropdown(trans('general.banking'), function ($sub) use($user, $attr) {
                     if ($user->can('read-banking-accounts')) {
                         $sub->url('banking/accounts', trans_choice('general.accounts', 2), 1, $attr);
@@ -104,6 +104,10 @@ class AdminMenu
                     if ($user->can('read-banking-transactions')) {
                         $sub->url('banking/transactions', trans_choice('general.transactions', 2), 3, $attr);
                     }
+
+                    if ($user->can('read-banking-reconciliations')) {
+                        $sub->url('banking/reconciliations', trans_choice('general.reconciliations', 2), 4, $attr);
+                    }
                 }, 5, [
                     'title' => trans('general.banking'),
                     'icon' => 'fa fa-university',
@@ -111,7 +115,13 @@ class AdminMenu
             }
 
             // Reports
-            if ($user->can(['read-reports-income-summary', 'read-reports-expense-summary', 'read-reports-income-expense-summary'])) {
+            if ($user->can([
+                'read-reports-income-summary',
+                'read-reports-expense-summary',
+                'read-reports-income-expense-summary',
+                'read-reports-tax-summary',
+                'read-reports-profit-loss',
+            ])) {
                 $menu->dropdown(trans_choice('general.reports', 2), function ($sub) use($user, $attr) {
                     if ($user->can('read-reports-income-summary')) {
                         $sub->url('reports/income-summary', trans('reports.summary.income'), 1, $attr);
@@ -123,6 +133,14 @@ class AdminMenu
 
                     if ($user->can('read-reports-income-expense-summary')) {
                         $sub->url('reports/income-expense-summary', trans('reports.summary.income_expense'), 3, $attr);
+                    }
+
+                    if ($user->can('read-reports-tax-summary')) {
+                        $sub->url('reports/tax-summary', trans('reports.summary.tax'), 4, $attr);
+                    }
+
+                    if ($user->can('read-reports-profit-loss')) {
+                        $sub->url('reports/profit-loss', trans('reports.profit_loss'), 5, $attr);
                     }
                 }, 6, [
                     'title' => trans_choice('general.reports', 2),
@@ -153,14 +171,18 @@ class AdminMenu
                     $modules = Module::all();
                     $position = 5;
                     foreach ($modules as $module) {
-                        $m = LaravelModule::findByAlias($module->alias);
-
-                        // Check if the module has settings
-                        if (empty($m->get('settings'))) {
+                        if (!$module->status) {
                             continue;
                         }
 
-                        $sub->url('settings/apps/' . $m->getAlias(), title_case(str_replace('_', ' ', snake_case($m->getName()))), $position, $attr);
+                        $m = LaravelModule::findByAlias($module->alias);
+
+                        // Check if the module exists and has settings
+                        if (!$m || empty($m->get('settings'))) {
+                            continue;
+                        }
+
+                        $sub->url('settings/apps/' . $module->alias, title_case(str_replace('_', ' ', snake_case($m->getName()))), $position, $attr);
 
                         $position++;
                     }

@@ -5,7 +5,7 @@
 @section('content')
     <!-- Default box -->
     <div class="box box-success">
-        {!! Form::open(['url' => 'expenses/vendors', 'role' => 'form']) !!}
+        {!! Form::open(['url' => 'expenses/vendors', 'files' => true, 'role' => 'form', 'class' => 'form-loading-button']) !!}
 
         <div class="box-body">
             {{ Form::textGroup('name', trans('general.name'), 'id-card-o') }}
@@ -22,7 +22,12 @@
 
             {{ Form::textareaGroup('address', trans('general.address')) }}
 
+            {{ Form::fileGroup('logo', trans_choice('general.pictures', 1)) }}
+
             {{ Form::radioGroup('enabled', trans('general.enabled')) }}
+
+            {{ Form::textGroup('reference', trans('general.reference'), 'file-text-o', []) }}
+
         </div>
         <!-- /.box-body -->
 
@@ -34,6 +39,14 @@
         {!! Form::close() !!}
     </div>
 @endsection
+
+@push('js')
+<script src="{{ asset('public/js/bootstrap-fancyfile.js') }}"></script>
+@endpush
+
+@push('css')
+<link rel="stylesheet" href="{{ asset('public/css/bootstrap-fancyfile.css') }}">
+@endpush
 
 @push('scripts')
     <script type="text/javascript">
@@ -47,6 +60,12 @@
 
             $("#currency_code").select2({
                 placeholder: "{{ trans('general.form.select.field', ['field' => trans_choice('general.currencies', 1)]) }}"
+            });
+
+            $('#logo').fancyfile({
+                text  : '{{ trans('general.form.select.file') }}',
+                style : 'btn-default',
+                placeholder : '{{ trans('general.form.no_file_selected') }}'
             });
         });
     </script>

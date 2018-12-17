@@ -1,6 +1,8 @@
+@stack('header_start')
+
 <header class="main-header">
     <!-- Logo -->
-    <a href="#" class="logo">
+    <a href="{{ url('customers') }}" class="logo">
         <!-- mini logo for sidebar mini 50x50 pixels -->
         <span class="logo-mini"><img src="{{ !empty($company->company_logo) ? Storage::url($company->company_logo) : asset('public/img/company.png') }}" class="logo-image-mini" width="25"  alt="{{ $company->company_name }}"></span>
         <!-- logo for regular state and mobile devices -->
@@ -11,13 +13,14 @@
         <!-- Sidebar toggle button-->
         <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
             <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
         </a>
+
+        @stack('header_navbar_left')
 
         <div class="navbar-custom-menu">
             <ul class="nav navbar-nav">
+                @stack('header_navbar_right')
+
                 <!-- Notifications: style can be found in dropdown.less -->
                 <li class="dropdown notifications-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -100,3 +103,5 @@
         </div>
     </nav>
 </header>
+
+@stack('header_end')

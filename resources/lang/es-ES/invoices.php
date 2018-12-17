@@ -12,10 +12,15 @@ return [
     'quantity'          => 'Cantidad',
     'price'             => 'Precio',
     'sub_total'         => 'Subtotal',
+    'discount'          => 'Descuento',
     'tax_total'         => 'Total Impuestos',
     'total'             => 'Total ',
 
     'item_name'         => 'Nombre del artículo | Nombres de artículo',
+
+    'show_discount'     => ':discount% Descuento',
+    'add_discount'      => 'Agregar Descuento',
+    'discount_desc'     => 'de subtotal',
 
     'payment_due'       => 'Vencimiento de pago',
     'paid'              => 'Pagado',
@@ -26,6 +31,7 @@ return [
     'mark_sent'         => 'Marcar Como Enviada',
     'download_pdf'      => 'Descargar PDF',
     'send_mail'         => 'Enviar Email',
+    'all_invoices'      => 'Inicie sesión para ver todas las facturas',
 
     'status' => [
         'draft'         => 'Borrador',
@@ -37,8 +43,21 @@ return [
     ],
 
     'messages' => [
-        'email_sent'    => 'El email de la factura se ha enviado correctamente!',
-        'marked_sent'   => 'Factura marcada como enviada con éxito!',
+        'email_sent'     => 'El email de la factura se ha enviado correctamente!',
+        'marked_sent'    => 'Factura marcada como enviada con éxito!',
+        'email_required' => 'Ninguna dirección de correo electrónico para este cliente!',
+        'draft'          => 'Esta es una factura <b>BORRADOR</b> y se reflejará en los gráficos luego de que sea enviada.',
+
+        'status' => [
+            'created'   => 'Creada el :date',
+            'send'      => [
+                'draft'     => 'No enviada',
+                'sent'      => 'Enviada el :date',
+            ],
+            'paid'      => [
+                'await'     => 'Pendiente de pago',
+            ],
+        ],
     ],
 
     'notification' => [

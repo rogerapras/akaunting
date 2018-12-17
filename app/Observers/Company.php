@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 
-use App\Models\Company\Company as Model;
+use App\Models\Common\Company as Model;
 use Artisan;
 use Auth;
 
@@ -41,7 +41,7 @@ class Company
         $tables = [
             'accounts', 'bill_histories', 'bill_items', 'bill_payments', 'bill_statuses', 'bills', 'categories',
             'currencies', 'customers', 'invoice_histories', 'invoice_items', 'invoice_payments', 'invoice_statuses',
-            'invoices', 'items', 'payments', 'revenues', 'settings', 'taxes', 'transfers', 'vendors',
+            'invoices', 'items', 'payments', 'recurring', 'revenues', 'settings', 'taxes', 'transfers', 'vendors',
         ];
 
         foreach ($tables as $table) {

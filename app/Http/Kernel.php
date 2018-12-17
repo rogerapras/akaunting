@@ -18,6 +18,7 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+        \Fideloper\Proxy\TrustProxies::class,
     ];
 
     /**
@@ -35,16 +36,48 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\RedirectIfNotInstalled::class,
-            \App\Http\Middleware\LoadSettings::class,
-            \App\Http\Middleware\LoadCurrencies::class,
             \App\Http\Middleware\AddXHeader::class,
+            'company.settings',
+            'company.currencies',
+        ],
+
+        'wizard' => [
+            'web',
+            'language',
+            'auth',
+            'permission:read-admin-panel',
+        ],
+
+        'admin' => [
+            'web',
+            'language',
+            'auth',
+            'adminmenu',
+            'permission:read-admin-panel',
+        ],
+
+        'customer' => [
+            'web',
+            'language',
+            'auth',
+            'customermenu',
+            'permission:read-customer-panel',
         ],
 
         'api' => [
+            'api.auth',
             'throttle:60,1',
             'bindings',
             'api.company',
+            'permission:read-api',
+            'company.settings',
+            'company.currencies',
         ],
+
+        'signed' => [
+            'signed-url',
+            'signed-url.company',
+        ]
     ];
 
     /**
@@ -68,5 +101,10 @@ class Kernel extends HttpKernel
         'ability' => \Laratrust\Middleware\LaratrustAbility::class,
         'api.company' => \App\Http\Middleware\ApiCompany::class,
         'install' => \App\Http\Middleware\CanInstall::class,
+        'company.settings' => \App\Http\Middleware\LoadSettings::class,
+        'company.currencies' => \App\Http\Middleware\LoadCurrencies::class,
+        'dateformat' => \App\Http\Middleware\DateFormat::class,
+        'money' => \App\Http\Middleware\Money::class,
+        'signed-url.company' => \App\Http\Middleware\SignedUrlCompany::class,
     ];
 }
